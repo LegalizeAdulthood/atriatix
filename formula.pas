@@ -36,6 +36,7 @@ type
     AA, BB, C, Lyapunov: double;
     AA_Initial: double;
 
+    bNone, bLinear, bSinusoidal, bSpherical, bSwirl, bHorseshoe, bPolar, bBent: Bool;
     bInvert: Bool;
 
     bInitialize: Bool;
@@ -65,16 +66,29 @@ type
   //procedure mask_the_color_linear;
 	procedure coloring;
   procedure boundary_test;
+  procedure boundary_test_2;
 	procedure average_pixel;
+
+  procedure None;
+  procedure Linear;
+  procedure Sinusoidal;
+  procedure Spherical;
+  procedure Swirl;
+  procedure Horseshoe;
+  procedure Polar;
+  procedure Bent;
 
 implementation
 
 var
   v: pDataPointer;
   x, y, z: Double;
+  x1, y1: Double;
 
   //x1, x2, x3, x4: double;
   //y1, y2, y3, y4: double;
+
+  x2, y2: double;
 
   a: double;
 
@@ -89,7 +103,7 @@ var
 
   //xnew, ynew, znew: double;
   xnew: double;
-  //ynew: double;
+  ynew: double;
 
   my_Index: double;
   my_Counter: integer;
@@ -103,7 +117,10 @@ var
   //rs, d2, dx, dy, dz, ri, df: double;
 
   // Scott Draves Flame variables
-  fx, fy: double;
+  r2, c1, c2, fx, fy: double;
+
+  // Scott Draves Flame variables
+  //fx, fy, r2, c1, c2, a: double;
 
   // Martins variable
   sign: double;
@@ -138,7 +155,7 @@ begin
   while (v.Abort_Draw = False) do
   begin
 
-    if (abs(x) * abs(y)) > 1e12 then
+    if (abs(x) * abs(y)) > 1e10 then
     begin
       //initialize_data;
       //ShowMessage('start over');
@@ -158,64 +175,43 @@ end;
 
 procedure boundary_test;
 begin
+	if (abs(x) > 1e4) or (abs(x) < 1e-4) then
+  begin
+  	x := 2*(random-0.5);
+  end;
 
-    (*
-    if ((abs(x) * abs(y)) > 1e5)  or ((abs(x) * abs(y)) < 1e-4) then
-    begin
-      //initialize_data;
-      //x := 0.1;
-      //y := 0.1;
-    end;
-    *)
+  if (abs(y) > 1e4) or (abs(y) < 1e-4) then
+  begin
+  	y := 2*(random-0.5);
+  end;
 
-    //ShowMessage('start over');
+  if (v.nPoints mod 1000 = 0) then
+  begin
+  	initialize_data;
+  end;
+end;
 
-    if (abs(x) > 1e4) or (abs(x) < 1e-4) then
-    begin
-        x := 2*(random-0.5);
-        //x := 5+sin(constPI*x);
-    end;
+procedure boundary_test_2;
+begin
+	if (abs(x) <= 1e-3) or (abs(y) <= 1e-3) then
+  begin
+  	x := random-0.5;
+    y := random-0.5;
+    //x := x*x+y*y;
+    //y := -x;
+    //x := 2*v.RandomFactor*sin(constPI*x);
+    //y := 2*v.RandomFactor*sin(constPI*y);
+  end;
 
-    if (abs(y) > 1e4) or (abs(y) < 1e-4) then
-    begin
-        y := 2*(random-0.5);
-        //y := 5+sin(constPI*y);
-    end;
-
-    if (v.nPoints mod 1000 = 0) then
-    begin
-      initialize_data;
-    end;
-
-    (*
-    //if x*x+y*y <= 1e-2 then
-    //begin
-      if abs(x) <= 1e-2 then
-      begin
-        x := sin(constPI*x);
-      end;
-
-      if abs(y) <= 1e-2 then
-      begin
-        y := sin(constPI*y);
-      end;
-    //end;
-
-    //if x*x+y*y > 1e2 then
-    //begin
-      if abs(x) > 1e5 then
-      begin
-        x := sin(constPI*x);
-      end;
-
-      if abs(y) > 1e5 then
-      begin
-        y := sin(constPI*y);
-      end;
-    //end;
-    *)
-
-    //end;
+  if (abs(x) > 1e3) or (abs(y) > 1e3) then
+  begin
+  	x := random-0.5;
+    y := random-0.5;
+    //x := x*x+y*y;
+    //y := -x;
+    //x := 2*v.RandomFactor*sin(constPI*x);
+    //y := 2*v.RandomFactor*sin(constPI*y);
+  end;
 end;
 
 procedure initialize_data;
@@ -226,6 +222,7 @@ begin
   v.Lyapunov := 0.0;
   v.T1 := 0;
   i := 1;
+
   while (i <= 60) do
   begin
     v.af[i] := v.RandomFactor*(Random - 0.5);    // 9.0
@@ -233,6 +230,28 @@ begin
     inc(i);
   end;
 
+  (*
+  while (i <= 20) do
+  begin
+    j := 0;
+	  while (j <= 2) do
+  	begin
+      if j = 0 then
+      begin
+	    	v.af[i+j*20] := v.RandomFactor*(Random - 0.5);
+  	  	v.bf[i+j*20] := v.RandomFactor*(Random - 0.5);
+      end
+      else
+      begin
+	    	v.af[i+j*20] := v.af[1] * v.af[1];
+  	  	v.bf[i+j*20] := v.bf[1] * v.bf[1];
+      end;
+    	inc(j);
+    end;
+    inc(i);
+  end;
+  *)
+  
   v.bInitialize := false;
 
   AA := v.RandomFactor*(random-0.5);
@@ -248,11 +267,11 @@ begin
   //x := v.RandomFactor*(v.RandomFactor*(random)-0.5);
   //y := v.RandomFactor*(v.RandomFactor*(random)-0.5);
 
-  x := 20*v.RandomFactor*(random-0.5);
-  y := 20*v.RandomFactor*(random-0.5);
+  x := 2*v.RandomFactor*(random-0.5);
+  y := 2*v.RandomFactor*(random-0.5);
 
-  x := -1.25;
-  y := 1.25;
+  //x := -1.25;
+  //y := 1.25;
 
   fx := x;
   fy := y;
@@ -334,10 +353,10 @@ begin
     3: j := Round(Random * 3*20);
   end;
 
-  if (j < 19) then
+  if (j <= 20) then
     j := 0
   else
-  if (j < 39) then
+  if (j <= 40) then
     j := 19
   else
     j := 39;
@@ -357,11 +376,6 @@ begin
   //x := xnew;
   //y := ynew;
 
-end;
-
-procedure accumulate;
-begin
-  DrawPointArray;
 end;
 
 procedure TListUpdate;
@@ -458,6 +472,12 @@ end;
 
 procedure DrawPointArray;
 begin
+	x2 := x;
+	y2 := y;
+
+  x := fx;
+  y := fy;
+
   PixelMap;
 
   if (nx >= 0) and (nx < v.iWidth) and (ny >= 0) and (ny < v.iHeight) then
@@ -662,6 +682,9 @@ begin
     end;
   end;
 
+  x := x2;
+  y := y2;
+
 end;
 
 procedure coloring;
@@ -705,9 +728,25 @@ begin
     blu := 255;
 
   tmp := Round((red+grn+blu)*0.33);
+
+  //if j = 0 then
+  //begin
+
   red := tmp + Round(v.dRedStep);
   grn := tmp + Round(v.dGrnStep);
   blu := tmp + Round(v.dBluStep);
+
+  //end
+  //else
+  //begin
+	  //red := tmp - Round(v.dRedStep);
+  	//grn := tmp - Round(v.dGrnStep);
+  	//blu := tmp - Round(v.dBluStep);
+	//end;
+
+  //Pix := v.aPG.Bits[nx, ny];
+  //average_pixel;
+  //v.aPG.Bits[nx, ny] := Pixel;
 
   if (red > 255) then
     red := 255;
@@ -1372,22 +1411,6 @@ begin
 
     			y := W - z;
 
-		    	if (abs(x) <= 1e-4) or (abs(y) <= 1e-4) then
-    		 	begin
-       			x := (random-0.5);
-      			y := (random-0.5);
-       			x := sin(2*constPI*x);
-      			y := sin(2*constPI*y);
-    			end;
-
-          if (abs(x) > 1e4) or (abs(y) > 1e4) then
-          begin
-          	x := (random-0.5);
-          	y := (random-0.5);
-            x := sin(x);
-            y := sin(y);
-          end;
-
 	    	end;
 
     61: begin
@@ -1415,34 +1438,6 @@ begin
               //         v.af[4]*x*sin(v.af[7]+x)));
 
     			y := W - z;
-
-		    	if abs(x) <= 1e-4 then
-    		 	begin
-       			x := 5*(random-0.5);
-       			//x := sin(2*constPI*x);
-    			end;
-
-    			if abs(y) <= 1e-4 then
-    			begin
-      			y := 5*(random-0.5);
-      			//y := sin(2*constPI*y);
-    			end;
-
-		    	if (abs(x) <= 1e-4) or (abs(y) <= 1e-4) then
-    		 	begin
-       			x := (random-0.5);
-      			y := (random-0.5);
-       			x := sin(2*constPI*x);
-      			y := sin(2*constPI*y);
-    			end;
-
-          if (abs(x) > 1e4) or (abs(y) > 1e4) then
-          begin
-          	x := (random-0.5);
-          	y := (random-0.5);
-            x := sin(x);
-            y := sin(y);
-          end;
 
 			end;
 
@@ -1491,22 +1486,6 @@ begin
               //         v.af[4]*x*sin(v.af[7]+x)));
 
     			y := W - z;
-
-		    	if (abs(x) <= 1e-4) or (abs(y) <= 1e-4) then
-    		 	begin
-       			x := (random-0.5);
-      			y := (random-0.5);
-       			x := sin(2*constPI*x);
-      			y := sin(2*constPI*y);
-    			end;
-
-          if (abs(x) > 1e4) or (abs(y) > 1e4) then
-          begin
-          	x := (random-0.5);
-          	y := (random-0.5);
-            x := sin(x);
-            y := sin(y);
-          end;
 			end;
 
     63: begin
@@ -1554,22 +1533,6 @@ begin
               //         v.af[4]*x*sin(v.af[7]+x)));
 
     			y := W - z;
-
-		    	if (abs(x) <= 1e-4) or (abs(y) <= 1e-4) then
-    		 	begin
-       			x := (random-0.5);
-      			y := (random-0.5);
-       			x := sin(2*constPI*x);
-      			y := sin(2*constPI*y);
-    			end;
-
-          if (abs(x) > 1e4) or (abs(y) > 1e4) then
-          begin
-          	x := (random-0.5);
-          	y := (random-0.5);
-            x := sin(x);
-            y := sin(y);
-          end;
 			end;
 
     64: begin
@@ -1617,21 +1580,6 @@ begin
 
     			y := W - z;
 
-		    	if (abs(x) <= 1e-4) or (abs(y) <= 1e-4) then
-    		 	begin
-       			x := (random-0.5);
-      			y := (random-0.5);
-       			x := sin(2*constPI*x);
-      			y := sin(2*constPI*y);
-    			end;
-
-          if (abs(x) > 1e4) or (abs(y) > 1e4) then
-          begin
-          	x := (random-0.5);
-          	y := (random-0.5);
-            x := sin(x);
-            y := sin(y);
-          end;
 			end;
 
     65: begin
@@ -1680,23 +1628,77 @@ begin
               //         v.af[4]*x*sin(v.af[7]+x)));
 
     			y := W - z;
-
-		    	if (abs(x) <= 1e-4) or (abs(y) <= 1e-4) then
-    		 	begin
-       			x := (random-0.5);
-      			y := (random-0.5);
-       			x := sin(2*constPI*x);
-      			y := sin(2*constPI*y);
-    			end;
-
-          if (abs(x) > 1e4) or (abs(y) > 1e4) then
-          begin
-          	x := (random-0.5);
-          	y := (random-0.5);
-            x := sin(x);
-            y := sin(y);
-          end;
 			end;
+
+    66: begin
+
+         	z := x;
+			   	x := BB*y+W;
+
+    			//W :=  (sign*(v.af[1]*x*sin(v.af[4]+x) +
+            //           v.af[2]*x*sin(v.af[5]+x) +
+              //         v.af[4]*x*sin(v.af[7]+x)));
+
+			    //W := sign*(v.af[7] + v.af[2]*x*sin(v.af[1]+x) +
+      			//                   v.af[2]*x*sin(v.af[1]+x) +
+            	//		             v.af[2]*x*sin(v.af[1]+x));
+
+				  //W := AA*x + ((1 - AA)*(2*x*x))/(1+x*x);
+
+				  //W := sign*AA*sin(v.af[3]*x) + AA*sin(v.af[5]*x); // OK
+				  //W := sign*AA*sin(v.af[1]*x+sin(v.af[2]*x)) + AA*sin(v.af[3]*x+sin(v.af[4]*x)); // OK
+
+				  //W := 0.5*sign*AA*abs(sin(y+sin(y))+sin(x+sin(x))); // shtoyata
+
+				  //W := 0.5*AA*sign*(abs(y+x));  // flare
+
+				  W := 0.5*AA*sign*(abs(y+x));
+
+				  //W := sign*AA*sin(v.af[1]*x)+AA*sin(v.af[2]*x+sin(v.af[3]*x)); // 64
+
+				  //W := (AA*x) + sign*((1 - AA)*(2*x*x))/(1+x*x);
+
+				  //W := (AA*x) + sin((1-AA)+(sin(x+sin(1+x))));
+
+         	//x := x + x/20000*sin(x);
+         	//W := AA*x + 0.2*(sin(4*constPI*x + (4*constPI*x) - (1 - AA)*(x*x)))/(1 + x*x)*sign;
+
+          //W := sign*(AA*x*sin(v.af[1]+x) + v.af[2]*x*sin(v.af[3]+x) + v.af[4]*x*sin(v.af[5]+x));
+
+			    //W := sign*(v.af[7] + v.af[2]*x*sin(v.af[1]+x) +
+      			//                   v.af[2]*x*sin(v.af[1]+x) +
+            	//		             v.af[2]*x*sin(v.af[1]+x));
+
+				  //W := sign*AA*x*sin(v.af[3]+x) + AA*x*sin(v.af[5]+x);
+
+          //W :=  sign*((1 - AA)*(2*x*x))/(1+x*x);
+
+    			//W :=        (sign*(v.af[1]*x*sin(v.af[4]+x) +
+            //           v.af[2]*x*sin(v.af[5]+x) +
+              //         v.af[4]*x*sin(v.af[7]+x)));
+
+    			y := W - z;
+
+			end;
+
+    70: begin
+	  		  z := x*v.af[1 + j] + y*v.af[2 + j] + v.af[3 + j];
+  	  		y := x*v.af[4 + j] + y*v.af[5 + j] + v.af[6 + j];
+          x := z;
+    		end;
+
+    71: begin
+			    z := x*v.af[1 + j] + y*v.af[1 + j] + v.af[5 + j] + sin(x) - sin(y);
+    			y := x*v.af[2 + j] + y*v.af[2 + j] + v.af[6 + j] + sin(x) - sin(y);
+          x := z;
+    		end;
+
+    72: begin
+         	z := x;
+			   	x := BB*y+W;
+	  		  x := v.af[1 + j]*sign*(x+y);
+    			y := W - z;
+    		end;
 
 	end;
 
@@ -1725,7 +1727,7 @@ begin
   //W := const2PI*sign*AA + constPI + cos(x) + sin(constPI+sin(constPI+x)); // this is cool
   //W := AA * sign + AA + sin(x + sin(x));
 
-
+  (*
   if (abs(x) <= 1e-4) or (abs(y) <= 1e-4) then
   begin
   	x := (random-0.5);
@@ -1741,11 +1743,187 @@ begin
     x := sin(x);
     y := sin(y);
   end;
+  *)
 
+  boundary_test_2;
 
   v.zx := x;
   v.zy := y;
 
 end;
+
+procedure accumulate;
+begin
+
+	x1 := x;
+  y1 := y;
+
+  fx := 0;
+  fy := 0;
+
+  //fx := x;
+  //fy := y;
+
+  if v.bNone then
+  begin
+  	None;
+	  DrawPointArray;
+  end;
+
+  if v.bSpherical then
+  begin
+		Spherical;
+	  DrawPointArray;
+  end;
+
+	if v.bSwirl then
+  begin
+	  Swirl;
+	  DrawPointArray;
+  end;
+
+  if v.bSinusoidal then
+  begin
+		Sinusoidal;
+	  DrawPointArray;
+  end;
+
+  if v.bBent then
+  begin
+  	Bent;
+	  DrawPointArray;
+  end;
+
+  if v.bPolar then
+  begin
+	  Polar;
+	  DrawPointArray;
+  end;
+
+  if v.bHorseShoe then
+  begin
+	  HorseShoe;
+	  DrawPointArray;
+  end;
+
+	if v.bLinear then
+  begin
+  	Linear;
+	  DrawPointArray;
+  end;
+
+	//fx := fx + v.RandomFactor*(Random - 0.5);
+	//fy := fy + v.RandomFactor*(Random - 0.5);
+
+  //x := fx;
+  //y := fy;
+
+  //DrawPointArray;
+
+	x := x1;
+  y := y1;
+
+  //fx := x;
+  //fy := y;
+
+end;
+
+procedure None;
+begin
+  fx := x;
+	fy := y;
+end;
+
+procedure Linear;
+begin
+  fx := fx + v.dFactor2 * x;
+  fy := fy + v.dFactor2 * y;
+end;
+
+procedure Sinusoidal;
+begin
+  // Sinusoidal
+  xnew := sin(x);
+  ynew := sin(y);
+  fx := fx + v.dFactor2 * xnew;
+  fy := fy + v.dFactor2 * ynew;
+end;
+
+procedure Spherical;
+begin
+  // ----- SPHERICAL -----
+  r2 := 1e-6+x*x+y*y;
+
+  xnew := fx/r2 + x/r2;
+  ynew := fy/r2 + y/r2;
+
+  fx := v.dFactor2 * (fx + xnew);
+  fy := v.dFactor2 * (fy + ynew);
+end;
+
+procedure Swirl;
+begin
+  // ----- SWIRL -----
+
+  r2 := 1e-6+x*x+y*y;
+
+  c1 := sin(r2);
+  c2 := cos(r2);
+
+  xnew := c1 * x - c2 * y;
+  ynew := c2 * x + c1 * y;
+
+  fx := fx + v.dFactor2 * xnew;
+  fy := fy + v.dFactor2 * ynew;
+end;
+
+procedure Horseshoe;
+begin
+  // ----- HORSESHOE -----
+  if ((x < -constZeroTol) or (x > constZeroTol) or
+      (y < -constZeroTol) or (y > constZeroTol)) then
+    a := ArcTan(x/(1e-6+y))
+  else
+    a := 0.0;
+
+  c1 := sin(a);
+  c2 := cos(a);
+
+  xnew := c1 * x - c2 * y;
+  ynew := c2 * x + c1 * y;
+
+  fx := fx + v.dFactor2 * xnew;
+  fy := fy + v.dFactor2 * ynew;
+end;
+
+procedure Polar;
+begin
+  // ----- POLAR -----
+  if ((x < -constZeroTol) or (x > constZeroTol) or
+      (y < -constZeroTol) or (y > constZeroTol)) then
+    xnew := ArcTan(x/(1e-6+y)) / constPI
+  else
+    xnew := 0.0;
+
+  ynew := sqrt(1e-6 + x*x + y*y) - 1.0;
+
+  fx := fx + v.dFactor2 * xnew;
+  fy := fy + v.dFactor2 * ynew;
+end;
+
+procedure Bent;
+begin
+  // ----- BENT -----
+  xnew := x;
+  ynew := y;
+  if (xnew < 0.0) then
+    xnew := xnew *2.0;
+  if (ynew < 0.0) then
+    ynew := ynew / 2.0;
+
+  fx := fx + v.dFactor2 * xnew;
+  fy := fy + v.dFactor2 * ynew;
+end;
+
 
 end.

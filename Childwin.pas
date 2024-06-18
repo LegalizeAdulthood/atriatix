@@ -42,6 +42,7 @@ type
     AA, BB, C, Lyapunov: double;
     AA_Initial: double;
 
+    bNone, bLinear, bSinusoidal, bSpherical, bSwirl, bHorseshoe, bPolar, bBent: Bool;
     bInvert: Bool;
 
     bInitialize: Bool;
@@ -158,6 +159,17 @@ type
     Draw63: TMenuItem;
     Draw64: TMenuItem;
     Draw65: TMenuItem;
+    IFS1: TMenuItem;
+    Draw70: TMenuItem;
+    Draw71: TMenuItem;
+    Draw72: TMenuItem;
+    Draw73: TMenuItem;
+    Draw74: TMenuItem;
+    Draw75: TMenuItem;
+    Draw66: TMenuItem;
+    Draw67: TMenuItem;
+    Draw68: TMenuItem;
+    Draw69: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
     procedure UpdateMenuItems(Sender: TObject);
@@ -272,6 +284,16 @@ type
     procedure Draw63Click(Sender: TObject);
     procedure Draw64Click(Sender: TObject);
     procedure Draw65Click(Sender: TObject);
+    procedure Draw70Click(Sender: TObject);
+    procedure Draw71Click(Sender: TObject);
+    procedure Draw72Click(Sender: TObject);
+    procedure Draw73Click(Sender: TObject);
+    procedure Draw74Click(Sender: TObject);
+    procedure Draw75Click(Sender: TObject);
+    procedure Draw66Click(Sender: TObject);
+    procedure Draw67Click(Sender: TObject);
+    procedure Draw68Click(Sender: TObject);
+    procedure Draw69Click(Sender: TObject);
 
   private
     { Private declarations }
@@ -416,9 +438,9 @@ begin
     v.dGrnStep := 0.0;
     v.dBluStep := 0.0;
 
-    v.formula := 62;
+    v.formula := 70;
     v.dFactor1 := 10;
-    v.dFactor2 := 0.1;
+    v.dFactor2 := 1.0;
     v.RandomFactor := 2.0;
     v.bInitialize := True;
     v.bSqrt := False;
@@ -431,6 +453,16 @@ begin
     v.bExpansion := false;
     v.bModulas := false;
 
+    // Scott Draves Flame functions
+    v.bNone        := True;
+    v.bLinear      := False;
+    v.bSinusoidal  := False;
+    v.bSpherical   := False;
+    v.bSwirl       := False;
+    v.bHorseshoe   := False;
+    v.bPolar       := False;
+    v.bBent        := False;
+    
     CreateTList;
 
     UpdateGrafX;  // call this to automatically start-up
@@ -586,6 +618,17 @@ begin
   Draw63.Checked := False;
   Draw64.Checked := False;
   Draw65.Checked := False;
+  Draw66.Checked := False;
+  Draw67.Checked := False;
+  Draw68.Checked := False;
+  Draw69.Checked := False;
+
+  Draw70.Checked := False;
+  Draw71.Checked := False;
+  Draw72.Checked := False;
+  Draw73.Checked := False;
+  Draw74.Checked := False;
+  Draw75.Checked := False;
 
   case v.formula of
   1: Draw01.Checked := True;
@@ -650,6 +693,17 @@ begin
   63: Draw63.Checked := True;
   64: Draw64.Checked := True;
   65: Draw65.Checked := True;
+  66: Draw66.Checked := True;
+  67: Draw67.Checked := True;
+  68: Draw68.Checked := True;
+  69: Draw69.Checked := True;
+
+  70: Draw70.Checked := True;
+  71: Draw71.Checked := True;
+  72: Draw72.Checked := True;
+  73: Draw73.Checked := True;
+  74: Draw74.Checked := True;
+  75: Draw75.Checked := True;
 
   end;
 
@@ -915,6 +969,15 @@ begin
     WriteLn(OutFile, FloatToStr(v.cx));
     WriteLn(OutFile, FloatToStr(v.cy));
 
+    if v.bNone then WriteLn(OutFile, IntToStr(1)) else  WriteLn(OutFile, IntToStr(0));
+    if v.bLinear then WriteLn(OutFile, IntToStr(1)) else  WriteLn(OutFile, IntToStr(0));
+    if v.bSinusoidal then WriteLn(OutFile, IntToStr(1)) else  WriteLn(OutFile, IntToStr(0));
+    if v.bSpherical then WriteLn(OutFile, IntToStr(1)) else  WriteLn(OutFile, IntToStr(0));
+    if v.bSwirl then WriteLn(OutFile, IntToStr(1)) else  WriteLn(OutFile, IntToStr(0));
+    if v.bHorseshoe then WriteLn(OutFile, IntToStr(1)) else  WriteLn(OutFile, IntToStr(0));
+    if v.bPolar then WriteLn(OutFile, IntToStr(1)) else  WriteLn(OutFile, IntToStr(0));
+    if v.bBent then WriteLn(OutFile, IntToStr(1)) else  WriteLn(OutFile, IntToStr(0));
+
     CloseFile(OutFile);
 
     //ShowMessage('Parameter filename = ' + strParamName + ' len= ' + IntToStr(Length(strParamName)));
@@ -1123,6 +1186,62 @@ try
   else
     v.cy := 5.0;
 
+  ReadFromParameterFile(Self);
+  if bValid = True then
+    if InString = '1' then
+      v.bNone := True
+    else
+      v.bNone := False;
+
+  ReadFromParameterFile(Self);
+  if bValid = True then
+    if InString = '1' then
+      v.bLinear := True
+    else
+      v.bLinear := False;
+
+  ReadFromParameterFile(Self);
+  if bValid = True then
+    if InString = '1' then
+      v.bSinusoidal := True
+    else
+      v.bSinusoidal := False;
+
+  ReadFromParameterFile(Self);
+  if bValid = True then
+    if InString = '1' then
+      v.bSpherical := True
+    else
+      v.bSpherical := False;
+
+  ReadFromParameterFile(Self);
+  if bValid = True then
+    if InString = '1' then
+      v.bSwirl := True
+    else
+      v.bSwirl := False;
+
+  ReadFromParameterFile(Self);
+  if bValid = True then
+    if InString = '1' then
+      v.bHorseshoe := True
+    else
+      v.bHorseshoe := False;
+
+  ReadFromParameterFile(Self);
+  if bValid = True then
+    if InString = '1' then
+      v.bPolar := True
+    else
+      v.bPolar := False;
+
+  ReadFromParameterFile(Self);
+  if bValid = True then
+    if InString = '1' then
+      v.bBent := True
+    else
+      v.bBent := False;
+
 except
   ShowMessage('Error reading parameter file');
 end;
@@ -1154,7 +1273,6 @@ begin
 
   end;
 end;
-
 
 procedure TMDIChild.Zoom1Click(Sender: TObject);
 begin
@@ -1437,11 +1555,11 @@ begin
   Form4.BluLabel1.Caption := Format('%F', [v.dBluStep]);
 
   v.dFactor1 := Round(Form4.Intensity.Position);
-  //v.dFactor2 := Round(Form4.Probability.Position)*0.01;
+  v.dFactor2 := Round(Form4.Factor2_bar.Position)*0.1;
   v.RandomFactor := Round(Form4.Randomizer.Position)*0.2;
 
   Form4.Factor1.Caption := Format('%F', [v.dFactor1]);
-  //Form4.Factor2.Caption := Format('%F', [v.dFactor2]);
+  Form4.Factor2.Caption := Format('%F', [v.dFactor2]);
   Form4.RandomFactor.Caption := Format('%F', [v.RandomFactor]);
 
   v.AA_Initial := Form4.constAA.Value;
@@ -1451,6 +1569,15 @@ begin
   v.bInvert := Form4.Invert.Checked;
   v.cx := Form4.parameterX.Value;
   v.cy := Form4.parameterY.Value;
+
+  v.bNone        := Form4.None.Checked;
+  v.bLinear      := Form4.Linear.Checked;
+  v.bSinusoidal  := Form4.Sinusoidal.Checked;
+  v.bSpherical   := Form4.Spherical.Checked;
+  v.bSwirl       := Form4.Swirl.Checked;
+  v.bHorseshoe   := Form4.Horseshoe.Checked;
+  v.bPolar       := Form4.Polar.Checked;
+  v.bBent        := Form4.Bent.Checked;
 
 end;
 
@@ -1480,17 +1607,27 @@ begin
     Form4.Invert.Checked := v.bInvert;
 
     Form4.Intensity.Position := Round(v.dFactor1);
-    //Form4.Probability.Position := Round(v.dFactor2*100.0);
+    Form4.Factor2_bar.Position := Round(v.dFactor2*10.0);
     Form4.Randomizer.Position := Round(v.RandomFactor)*5;
 
     Form4.Factor1.Caption := Format('%F', [v.dFactor1]);
-    //Form4.Factor2.Caption := Format('%F', [v.dFactor2]);
+    Form4.Factor2.Caption := Format('%F', [v.dFactor2]);
     Form4.RandomFactor.Caption := Format('%F', [v.RandomFactor]);
 
     Form4.constAA.Value := v.AA;
     Form4.constBB.Value := v.BB;
     Form4.parameterX.Value := v.cx;
     Form4.parameterY.Value := v.cy;
+
+    // Scott Draves Flame functions
+    Form4.None.Checked       := v.bNone;
+    Form4.Linear.Checked     := v.bLinear;
+    Form4.Sinusoidal.Checked := v.bSinusoidal;
+    Form4.Spherical.Checked  := v.bSpherical;
+    Form4.Swirl.Checked      := v.bSwirl;
+    Form4.Horseshoe.Checked  := v.bHorseshoe;
+    Form4.Polar.Checked      := v.bPolar;
+    Form4.Bent.Checked       := v.bBent;
 
     CForm.A01.Value := v.af[01];
     CForm.A02.Value := v.af[02];
@@ -2035,6 +2172,85 @@ begin
   UpdateGrafX;
 end;
 
+procedure TMDIChild.Draw66Click(Sender: TObject);
+begin
+  v.BB := 1.00;
+  v.bInitialize := True;
+  v.formula := 66;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw67Click(Sender: TObject);
+begin
+  v.BB := 1.00;
+  v.bInitialize := True;
+  v.formula := 67;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw68Click(Sender: TObject);
+begin
+  v.BB := 1.00;
+  v.bInitialize := True;
+  v.formula := 68;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw69Click(Sender: TObject);
+begin
+  v.BB := 1.00;
+  v.bInitialize := True;
+  v.formula := 69;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw70Click(Sender: TObject);
+begin
+  v.BB := 1.00;
+  v.bInitialize := True;
+  v.formula := 70;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw71Click(Sender: TObject);
+begin
+  v.BB := 1.00;
+  v.bInitialize := True;
+  v.formula := 71;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw72Click(Sender: TObject);
+begin
+  v.BB := 1.00;
+  v.bInitialize := True;
+  v.formula := 72;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw73Click(Sender: TObject);
+begin
+  v.BB := 1.00;
+  v.bInitialize := True;
+  v.formula := 73;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw74Click(Sender: TObject);
+begin
+  v.BB := 1.00;
+  v.bInitialize := True;
+  v.formula := 74;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw75Click(Sender: TObject);
+begin
+  v.BB := 1.00;
+  v.bInitialize := True;
+  v.formula := 75;
+  UpdateGrafX;
+end;
 
 // ------
 
@@ -2124,6 +2340,7 @@ begin
   PGImage1.ActionMode := amMoveImage;
   v.aPG := ResultPG;
 end;
+
 
 end.
 

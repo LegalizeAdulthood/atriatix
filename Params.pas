@@ -42,13 +42,24 @@ type
     parameterY: TRxSpinEdit;
     CoolLabel8: TCoolLabel;
     CoolLabel9: TCoolLabel;
+    Factor2: TCoolLabel;
+    Linear: TCoolCheckRadioBox;
+    Sinusoidal: TCoolCheckRadioBox;
+    Spherical: TCoolCheckRadioBox;
+    Swirl: TCoolCheckRadioBox;
+    Horseshoe: TCoolCheckRadioBox;
+    Polar: TCoolCheckRadioBox;
+    Bent: TCoolCheckRadioBox;
+    Factor2_bar: TCoolTrackBar;
+    None: TCoolCheckRadioBox;
+    CoolLabel10: TCoolLabel;
     procedure ColorTimerTimer(Sender: TObject);
     procedure RedBar1Change(Sender: TObject);
     procedure GrnBar1Change(Sender: TObject);
     procedure BluBar1Change(Sender: TObject);
     procedure IntensityChange(Sender: TObject);
     procedure square_rootClick(Sender: TObject);
-    procedure ProbabilityChange(Sender: TObject);
+    procedure Factor2_barChange(Sender: TObject);
     procedure InvertClick(Sender: TObject);
     procedure constAAChange(Sender: TObject);
     procedure ResetButtonClick(Sender: TObject);
@@ -56,6 +67,14 @@ type
     procedure DrawRandomButtonClick(Sender: TObject);
     procedure CloseButtonClick(Sender: TObject);
     procedure ToolbarButton972Click(Sender: TObject);
+    procedure NoneClick(Sender: TObject);
+    procedure LinearClick(Sender: TObject);
+    procedure SinusoidalClick(Sender: TObject);
+    procedure SwirlClick(Sender: TObject);
+    procedure BentClick(Sender: TObject);
+    procedure HorseshoeClick(Sender: TObject);
+    procedure SphericalClick(Sender: TObject);
+    procedure PolarClick(Sender: TObject);
 
   private
     { Private declarations }
@@ -111,7 +130,7 @@ begin
   ColorTimer.Enabled := True;
 end;
 
-procedure TForm4.ProbabilityChange(Sender: TObject);
+procedure TForm4.Factor2_barChange(Sender: TObject);
 begin
   ticks := 0;
   ColorTimer.Enabled := True;
@@ -134,6 +153,56 @@ begin
   ticks := 0;
   ColorTimer.Enabled := True;
 end;
+
+procedure TForm4.NoneClick(Sender: TObject);
+begin
+  ticks := 0;
+  ColorTimer.Enabled := True;
+end;
+
+procedure TForm4.LinearClick(Sender: TObject);
+begin
+  ticks := 0;
+  ColorTimer.Enabled := True;
+end;
+
+procedure TForm4.SinusoidalClick(Sender: TObject);
+begin
+  ticks := 0;
+  ColorTimer.Enabled := True;
+end;
+
+procedure TForm4.SwirlClick(Sender: TObject);
+begin
+  ticks := 0;
+  ColorTimer.Enabled := True;
+end;
+
+procedure TForm4.BentClick(Sender: TObject);
+begin
+  ticks := 0;
+  ColorTimer.Enabled := True;
+end;
+
+procedure TForm4.HorseshoeClick(Sender: TObject);
+begin
+  ticks := 0;
+  ColorTimer.Enabled := True;
+end;
+
+procedure TForm4.SphericalClick(Sender: TObject);
+begin
+  ticks := 0;
+  ColorTimer.Enabled := True;
+end;
+
+procedure TForm4.PolarClick(Sender: TObject);
+begin
+  ticks := 0;
+  ColorTimer.Enabled := True;
+end;
+
+// --------------
 
 procedure TForm4.ResetButtonClick(Sender: TObject);
 begin
@@ -159,10 +228,6 @@ procedure TForm4.ToolbarButton972Click(Sender: TObject);
 begin
   MainForm.StopButtonClick(Self);
 end;
-
-
-
-
 
 
 end.

@@ -38,6 +38,10 @@ type
     ApplyButton: TToolbarButton97;
     ToolbarButton971: TToolbarButton97;
     ToolbarButton972: TToolbarButton97;
+    parameterX: TRxSpinEdit;
+    parameterY: TRxSpinEdit;
+    CoolLabel8: TCoolLabel;
+    CoolLabel9: TCoolLabel;
     procedure ColorTimerTimer(Sender: TObject);
     procedure RedBar1Change(Sender: TObject);
     procedure GrnBar1Change(Sender: TObject);
@@ -155,6 +159,11 @@ procedure TForm4.ToolbarButton972Click(Sender: TObject);
 begin
   MainForm.StopButtonClick(Self);
 end;
+
+
+
+
+
 
 end.
 

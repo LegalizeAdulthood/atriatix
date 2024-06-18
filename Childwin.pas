@@ -71,7 +71,6 @@ type
     N800by6001: TMenuItem;
     N1024by7681: TMenuItem;
     CustomSize1: TMenuItem;
-    Palette1: TMenuItem;
     PGSaveDialog1: TPGSaveDialog;
     Zoom1: TMenuItem;
     StatusBar1: TStatusBar;
@@ -130,6 +129,28 @@ type
     Draw39: TMenuItem;
     Draw40: TMenuItem;
     Draw33: TMenuItem;
+    AntiAlias211: TMenuItem;
+    AntiAlias311: TMenuItem;
+    AntiAlias411: TMenuItem;
+    N1: TMenuItem;
+    Formula3: TMenuItem;
+    Draw41: TMenuItem;
+    Draw42: TMenuItem;
+    Draw43: TMenuItem;
+    Draw44: TMenuItem;
+    Draw45: TMenuItem;
+    Draw46: TMenuItem;
+    Draw47: TMenuItem;
+    Draw48: TMenuItem;
+    Draw49: TMenuItem;
+    Draw50: TMenuItem;
+    Draw51: TMenuItem;
+    Draw52: TMenuItem;
+    Draw53: TMenuItem;
+    Draw54: TMenuItem;
+    Draw55: TMenuItem;
+    N2: TMenuItem;
+    N3: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
     procedure UpdateMenuItems(Sender: TObject);
@@ -217,6 +238,27 @@ type
     procedure Draw40Click(Sender: TObject);
     procedure Draw25Click(Sender: TObject);
     procedure Draw33Click(Sender: TObject);
+    procedure AntiAlias211Click(Sender: TObject);
+    procedure AntiAlias311Click(Sender: TObject);
+    procedure AntiAlias411Click(Sender: TObject);
+    procedure Alias211(Sender: TObject);
+    procedure Alias311(Sender: TObject);
+    procedure Alias411(Sender: TObject);
+    procedure Draw41Click(Sender: TObject);
+    procedure Draw42Click(Sender: TObject);
+    procedure Draw43Click(Sender: TObject);
+    procedure Draw44Click(Sender: TObject);
+    procedure Draw45Click(Sender: TObject);
+    procedure Draw46Click(Sender: TObject);
+    procedure Draw47Click(Sender: TObject);
+    procedure Draw48Click(Sender: TObject);
+    procedure Draw49Click(Sender: TObject);
+    procedure Draw50Click(Sender: TObject);
+    procedure Draw51Click(Sender: TObject);
+    procedure Draw52Click(Sender: TObject);
+    procedure Draw53Click(Sender: TObject);
+    procedure Draw54Click(Sender: TObject);
+    procedure Draw55Click(Sender: TObject);
 
   private
     { Private declarations }
@@ -296,6 +338,16 @@ procedure TMDIChild.Timer1Timer(Sender: TObject);
 begin
   Timer1.Enabled := False;
   FormPaint;
+
+  if Application.Title = 'REDUCE211' then
+     Alias211(Self);
+
+  if Application.Title = 'REDUCE311' then
+     Alias311(Self);
+
+  if Application.Title = 'REDUCE411' then
+     Alias411(Self);
+
 end;
 
 procedure TMDIChild.FormPaint;
@@ -359,6 +411,8 @@ begin
     v.bSqrt := False;
     v.nCoefficients := 3;
     v.BB := 1.0;
+    v.cx := 5.0;
+    v.cy := 5.0;
 
     v.bColorMix := false;
     v.bExpansion := false;
@@ -497,6 +551,21 @@ begin
   Draw38.Checked := False;
   Draw39.Checked := False;
   Draw40.Checked := False;
+  Draw41.Checked := False;
+  Draw42.Checked := False;
+  Draw43.Checked := False;
+  Draw44.Checked := False;
+  Draw45.Checked := False;
+  Draw46.Checked := False;
+  Draw47.Checked := False;
+  Draw48.Checked := False;
+  Draw49.Checked := False;
+  Draw50.Checked := False;
+  Draw51.Checked := False;
+  Draw52.Checked := False;
+  Draw53.Checked := False;
+  Draw54.Checked := False;
+  Draw55.Checked := False;
 
   case v.formula of
   1: Draw01.Checked := True;
@@ -539,6 +608,21 @@ begin
   38: Draw38.Checked := True;
   39: Draw39.Checked := True;
   40: Draw40.Checked := True;
+  41: Draw41.Checked := True;
+  42: Draw42.Checked := True;
+  43: Draw43.Checked := True;
+  44: Draw44.Checked := True;
+  45: Draw45.Checked := True;
+  46: Draw46.Checked := True;
+  47: Draw47.Checked := True;
+  48: Draw48.Checked := True;
+  49: Draw49.Checked := True;
+  50: Draw50.Checked := True;
+  51: Draw51.Checked := True;
+  52: Draw52.Checked := True;
+  53: Draw53.Checked := True;
+  54: Draw54.Checked := True;
+  55: Draw55.Checked := True;
   end;
 
 end;
@@ -798,7 +882,9 @@ begin
     else
       WriteLn(OutFile, IntToStr(0));
 
-    //bColorMix, bExpansion, bModulas: BOOL;
+    // write the X and Y parameters
+    WriteLn(OutFile, FloatToStr(v.cx));
+    WriteLn(OutFile, FloatToStr(v.cy));
 
     CloseFile(OutFile);
 
@@ -995,7 +1081,18 @@ try
     else
       v.bModulas := False;
 
-  //bColorMix, bExpansion, bModulas: BOOL;
+  // read the X and Y values
+  ReadFromParameterFile(Self);
+  if bValid = True then
+    v.cx := StrToFloat(InString)
+  else
+    v.cx := 5.0;
+
+  ReadFromParameterFile(Self);
+  if bValid = True then
+    v.cy := StrToFloat(InString)
+  else
+    v.cy := 5.0;
 
 except
   ShowMessage('Error reading parameter file');
@@ -1323,6 +1420,8 @@ begin
   v.BB := Form4.constBB.Value;
   v.bSqrt   := Form4.square_root.Checked;
   v.bInvert := Form4.Invert.Checked;
+  v.cx := Form4.parameterX.Value;
+  v.cy := Form4.parameterY.Value;
 
 end;
 
@@ -1361,6 +1460,8 @@ begin
 
     Form4.constAA.Value := v.AA;
     Form4.constBB.Value := v.BB;
+    Form4.parameterX.Value := v.cx;
+    Form4.parameterY.Value := v.cy;
 
     CForm.A01.Value := v.af[01];
     CForm.A02.Value := v.af[02];
@@ -1728,10 +1829,134 @@ end;
 
 procedure TMDIChild.Draw40Click(Sender: TObject);
 begin
+  v.BB := 1.00;
   v.bInitialize := True;
   v.formula := 40;
   UpdateGrafX;
 end;
+
+procedure TMDIChild.Draw41Click(Sender: TObject);
+begin
+  v.BB := 1.00;
+  v.bInitialize := True;
+  v.formula := 41;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw42Click(Sender: TObject);
+begin
+  v.BB := 1.00;
+  v.bInitialize := True;
+  v.formula := 42;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw43Click(Sender: TObject);
+begin
+  v.BB := 1.00;
+  v.bInitialize := True;
+  v.formula := 43;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw44Click(Sender: TObject);
+begin
+  v.BB := 1.00;
+  v.bInitialize := True;
+  v.formula := 44;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw45Click(Sender: TObject);
+begin
+  v.BB := 1.00;
+  v.bInitialize := True;
+  v.formula := 45;
+  UpdateGrafX;
+
+end;
+
+procedure TMDIChild.Draw46Click(Sender: TObject);
+begin
+  v.BB := 1.00;
+  v.bInitialize := True;
+  v.formula := 46;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw47Click(Sender: TObject);
+begin
+  v.BB := 1.00;
+  v.bInitialize := True;
+  v.formula := 47;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw48Click(Sender: TObject);
+begin
+  v.BB := 1.00;
+  v.bInitialize := True;
+  v.formula := 48;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw49Click(Sender: TObject);
+begin
+  v.BB := 1.00;
+  v.bInitialize := True;
+  v.formula := 49;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw50Click(Sender: TObject);
+begin
+  v.BB := 1.00;
+  v.bInitialize := True;
+  v.formula := 50;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw51Click(Sender: TObject);
+begin
+  v.BB := 1.00;
+  v.bInitialize := True;
+  v.formula := 51;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw52Click(Sender: TObject);
+begin
+  v.BB := 1.00;
+  v.bInitialize := True;
+  v.formula := 52;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw53Click(Sender: TObject);
+begin
+  v.BB := 1.00;
+  v.bInitialize := True;
+  v.formula := 53;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw54Click(Sender: TObject);
+begin
+  v.BB := 1.00;
+  v.bInitialize := True;
+  v.formula := 54;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw55Click(Sender: TObject);
+begin
+  v.BB := 1.00;
+  v.bInitialize := True;
+  v.formula := 55;
+  UpdateGrafX;
+end;
+
+// ------
 
 procedure TMDIChild.ModulasClick(Sender: TObject);
 begin
@@ -1750,6 +1975,76 @@ begin
   v.bColorMix := not v.bColorMix;
   UpdateGrafX;
 end;
+
+procedure TMDIChild.AntiAlias211Click(Sender: TObject);
+begin
+  PGImage1.ActionMode := amNone;
+  PGImage1.PICBox.Cursor := crHourGlass;
+  ShowCursor(True);
+  Timer1.Enabled := True;
+  Application.Title := 'REDUCE211';
+end;
+
+procedure TMDIChild.Alias211(Sender: TObject);
+begin
+  SourcePG:=PGImage1.LendNoModifyPixelGraphic;
+  ResultPG:=TPixelGraphic.Create;
+  ResultPG.SetDimension(SourcePG.Width div 2, SourcePG.Height div 2, bc24);
+  // set ResultPG.StretchMode if desired
+  ResultPG.StretchDraw(SourcePG);
+  PGImage1.TakePixelGraphic(ResultPG);
+
+  PGImage1.PICBox.Cursor := crArrow;
+  PGImage1.ActionMode := amMoveImage;
+  v.aPG := ResultPG;
+end;
+
+procedure TMDIChild.AntiAlias311Click(Sender: TObject);
+begin
+  PGImage1.ActionMode := amNone;
+  PGImage1.PICBox.Cursor := crHourGlass;
+  ShowCursor(True);
+  Timer1.Enabled := True;
+  Application.Title := 'REDUCE311';
+end;
+
+procedure TMDIChild.Alias311(Sender: TObject);
+begin
+  SourcePG:=PGImage1.LendNoModifyPixelGraphic;
+  ResultPG:=TPixelGraphic.Create;
+  ResultPG.SetDimension(SourcePG.Width div 3, SourcePG.Height div 3, bc24);
+  // set ResultPG.StretchMode if desired
+  ResultPG.StretchDraw(SourcePG);
+  PGImage1.TakePixelGraphic(ResultPG);
+
+  PGImage1.PICBox.Cursor := crArrow;
+  PGImage1.ActionMode := amMoveImage;
+  v.aPG := ResultPG;
+end;
+
+procedure TMDIChild.AntiAlias411Click(Sender: TObject);
+begin
+  PGImage1.ActionMode := amNone;
+  PGImage1.PICBox.Cursor := crHourGlass;
+  ShowCursor(True);
+  Timer1.Enabled := True;
+  Application.Title := 'REDUCE411';
+end;
+
+procedure TMDIChild.Alias411(Sender: TObject);
+begin
+  SourcePG:=PGImage1.LendNoModifyPixelGraphic;
+  ResultPG:=TPixelGraphic.Create;
+  ResultPG.SetDimension(SourcePG.Width div 4, SourcePG.Height div 4, bc24);
+  // set ResultPG.StretchMode if desired
+  ResultPG.StretchDraw(SourcePG);
+  PGImage1.TakePixelGraphic(ResultPG);
+
+  PGImage1.PICBox.Cursor := crArrow;
+  PGImage1.ActionMode := amMoveImage;
+  v.aPG := ResultPG;
+end;
+
 
 end.
 

@@ -62,7 +62,7 @@ type
   procedure accumulate;
   procedure TListUpdate;
   procedure PixelMap;
-  procedure mask_the_color_linear;
+  //procedure mask_the_color_linear;
 	procedure coloring;
   procedure boundary_test;
 
@@ -131,10 +131,10 @@ begin
 
     if (abs(x) * abs(y)) > 1e10 then
     begin
-      initialize_data;
+      //initialize_data;
       //ShowMessage('start over');
-      zero_init;
-      //v.Abort_Draw := True;
+      //zero_init;
+      v.Abort_Draw := True;
     end
     else
     begin
@@ -205,7 +205,7 @@ begin
       end;
     //end;
     *)
-    
+
     //end;
 end;
 
@@ -226,23 +226,32 @@ begin
 
   v.bInitialize := false;
 
-  AA := v.RandomFactor*(random);
+  AA := v.RandomFactor*(random-0.5);
+
+  //AA := -0.3;
+
   v.C  := AA;
   v.AA := AA;
   v.AA_Initial := AA;
-  W := 0;
+  W := 1;
 
   //x := v.RandomFactor*(v.RandomFactor*(random)-0.5);
   //y := v.RandomFactor*(v.RandomFactor*(random)-0.5);
 
-  x := v.RandomFactor*(random);
-  y := v.RandomFactor*(random);
+  x := 20*v.RandomFactor*(random-0.5);
+  y := 20*v.RandomFactor*(random-0.5);
 
-  //x := 10;
-  //y := 10;
+  //x := 0.011;
+  //y := 0.011;
 
   fx := x;
   fy := y;
+
+  v.cx := x;
+  v.cy := y;
+
+  v.zx := x;
+  v.zy := y;
 
   sign := 1;
 
@@ -250,6 +259,7 @@ end;
 
 procedure zero_init;
 begin
+
   v.T1 := 0;
   v.nPoints := 0;
   v.xtot := 0;
@@ -267,8 +277,9 @@ begin
   else
     nsq := v.Height;
 
-  x := fx;
-  y := fy;
+  x := v.cx;
+  y := v.cy;
+  W := 0;
 
   nx := 0;
   while nx < nsq do  // width
@@ -381,10 +392,10 @@ begin
   if (nx >= 0) and (nx < v.iWidth) and (ny >= 0) and (ny < v.iHeight) then
   begin
     begin
-      //LSum := abs(sin(constPI*arctan((1+x-x_save)/(1+y-y_save))));
+      LSum := abs(sin(constPI*arctan((1+x-x_save)/(1+y-y_save))));
 
       //LSum := abs(sin(constPI*((1+x-x_save)+(1+y-y_save))));
-      LSum := 1;
+      //LSum := 1;
 
       Pointer(my_Counter) := v.my_TList[nx*(v.Width-1)+ny];
       my_Counter := my_Counter + Round(10+v.dFactor1 * LSum);
@@ -411,9 +422,107 @@ begin
       *)
 
       Pixel := RGB(red, grn, blu);
+
       v.aPG.Bits[nx, ny] := Pixel;
+
+  red := Round(red*0.75);
+  grn := Round(grn*0.75);
+  blu := Round(blu*0.75);
+
+  Pixel := RGB(red, grn, blu);
+
+  if (nx+1 >= 0) and (nx+1 < v.iWidth) and (ny+1 >= 0) and (ny+1 < v.iHeight) then
+  begin
+    Pointer(my_Counter) := v.my_TList[(nx+1)*(v.Width-1)+(ny+1)];
+    if (my_counter <= 50) then
+      v.aPG.Bits[nx+1, ny+1] := Pixel;
+  end;
+
+  if (nx-1 >= 0) and (nx-1 < v.iWidth) and (ny-1 >= 0) and (ny-1 < v.iHeight) then
+  begin
+    Pointer(my_Counter) := v.my_TList[(nx-1)*(v.Width-1)+(ny+1)];
+    if (my_counter <= 50) then
+      v.aPG.Bits[nx-1, ny-1] := Pixel;
+  end;
+
+  if (nx+1 >= 0) and (nx+1 < v.iWidth) and (ny-1 >= 0) and (ny-1 < v.iHeight) then
+  begin
+    Pointer(my_Counter) := v.my_TList[(nx+1)*(v.Width-1)+(ny-1)];
+    if (my_counter <= 50) then
+      v.aPG.Bits[nx+1, ny-1] := Pixel;
+  end;
+
+  if (nx-1 >= 0) and (nx-1 < v.iWidth) and (ny+1 >= 0) and (ny+1 < v.iHeight) then
+  begin
+    Pointer(my_Counter) := v.my_TList[(nx-1)*(v.Width-1)+(ny+1)];
+    if (my_counter <= 50) then
+      v.aPG.Bits[nx-1, ny+1] := Pixel;
+  end;
+
+  /////////////
+
+  if (nx+0 >= 0) and (nx+0 < v.iWidth) and (ny+1 >= 0) and (ny+1 < v.iHeight) then
+  begin
+    Pointer(my_Counter) := v.my_TList[(nx+0)*(v.Width-1)+(ny+1)];
+    if (my_counter <= 50) then
+      v.aPG.Bits[nx+0, ny+1] := Pixel;
+  end;
+
+  if (nx-0 >= 0) and (nx-0 < v.iWidth) and (ny-1 >= 0) and (ny-1 < v.iHeight) then
+  begin
+    Pointer(my_Counter) := v.my_TList[(nx-0)*(v.Width-1)+(ny-1)];
+    if (my_counter <= 50) then
+      v.aPG.Bits[nx-0, ny-1] := Pixel;
+  end;
+
+  if (nx+1 >= 0) and (nx+1 < v.iWidth) and (ny-0 >= 0) and (ny-0 < v.iHeight) then
+  begin
+    Pointer(my_Counter) := v.my_TList[(nx+1)*(v.Width-1)+(ny+0)];
+    if (my_counter <= 50) then
+      v.aPG.Bits[nx+1, ny-0] := Pixel;
+  end;
+
+  if (nx-1 >= 0) and (nx-1 < v.iWidth) and (ny+0 >= 0) and (ny+0 < v.iHeight) then
+  begin
+    Pointer(my_Counter) := v.my_TList[(nx-1)*(v.Width-1)+(ny+0)];
+    if (my_counter <= 50) then
+      v.aPG.Bits[nx-1, ny+0] := Pixel;
+  end;
+
+  /////////////
+
+  if (nx+0 >= 0) and (nx+0 < v.iWidth) and (ny+2 >= 0) and (ny+2 < v.iHeight) then
+  begin
+    Pointer(my_Counter) := v.my_TList[(nx+0)*(v.Width-1)+(ny+2)];
+    if (my_counter <= 50) then
+      v.aPG.Bits[nx+0, ny+2] := Pixel;
+  end;
+
+  if (nx-0 >= 0) and (nx-0 < v.iWidth) and (ny-2 >= 0) and (ny-2 < v.iHeight) then
+  begin
+    Pointer(my_Counter) := v.my_TList[(nx-0)*(v.Width-1)+(ny-2)];
+    if (my_counter <= 50) then
+      v.aPG.Bits[nx-0, ny-2] := Pixel;
+  end;
+
+  if (nx+2 >= 0) and (nx+2 < v.iWidth) and (ny-0 >= 0) and (ny-0 < v.iHeight) then
+  begin
+    Pointer(my_Counter) := v.my_TList[(nx+2)*(v.Width-1)+(ny+0)];
+    if (my_counter <= 50) then
+      v.aPG.Bits[nx+2, ny-0] := Pixel;
+  end;
+
+  if (nx-2 >= 0) and (nx-2 < v.iWidth) and (ny+0 >= 0) and (ny+0 < v.iHeight) then
+  begin
+    Pointer(my_Counter) := v.my_TList[(nx-2)*(v.Width-1)+(ny+0)];
+    if (my_counter <= 50) then
+      v.aPG.Bits[nx-2, ny+0] := Pixel;
+  end;
+
+
     end;
   end;
+
 end;
 
 procedure coloring;
@@ -551,54 +660,6 @@ begin
 
 end;
 
-procedure mask_the_color_linear;
-begin
-  // this procedure accepts values of r, g, and b between -PI/2 and PI/2
-  // and returns values of red, grn, and blu
-
-  if (red > 255) or (grn > 255) or (blu > 255) then
-    bug := bug + 1;
-
-  r := r;
-  g := g;
-  b := b;
-
-  //r := r/10;
-  //g := g/10;
-  //b := b/10;
-
-  r := r*v.dFactor1;
-  g := g*v.dFactor1;
-  b := b*v.dFactor1;
-
-  red := Round(r*v.dRedStep);
-  grn := Round(g*v.dGrnStep);
-  blu := Round(b*v.dBluStep);
-
-  if red > 255 then
-    red := 255;
-  if grn > 255 then
-    grn := 255;
-  if blu > 255 then
-    blu := 255;
-
-  if red < 0 then
-    red := 0;
-  if grn < 0 then
-    grn := 0;
-  if red < 0 then
-    blu := 0;
-
-  if v.bInvert = True then
-  begin
-    // invert the color
-    red := not red and $FF;
-    grn := not grn and $FF;
-    blu := not blu and $FF;
-  end;
-
-end;
-
 procedure Mira_01;
 begin
   if (v.nPoints mod 1000 = 0) then
@@ -646,79 +707,19 @@ begin
   x_save := x;
   y_save := y;
 
-  (*
-    {formula #1}
-
-    x = -0.1
-    y =  0.0
-
-    p = { a random value between -1 and 1.
-          For some formulas it must be between -1 and 0,
-          but a value = 0 is not allowed }
-
-    a = { a value that is usually = 1.0.
-          With values above 1.0, most attractors 'explode',
-          with values below 1.0, most attractors 'implode'.
-          Try slight variations between 0.99 and 1.01 }
-
-    loop begin
-
-   1: xn =  a * y + p * x  + 2 * x * x * (1 - p) / (1 + x * x)
-      yn = -x + p * xn + 2 * xn * xn * (1 - p) / (1 + xn * xn)
-
-   2: xn =  a * y + p * x + 2 * sqr(x) * (1 - p) / (1 + sqr(x))
-      yn = -x + p * xn + 2 * y * xn * (1 - p) / (1 + sqr(xn))
-
-   3: xn:=  a * y + p * x + 2 * sqr(x) * (1 - p) / (1 + sqr(x));
-      yn:= -x + p * xn + 2 * sqr(xn) * (sqrt(abs(y)) - p) / (1 + sqr(xn));
-
-   4: xn =  a * y + p * x + 2 * sqr(x) * (1 - p) / (1 + sqr(x))
-      yn = -x + p * xn + 2 * sqr(xn) * (1 - p) / (1 + y * xn)
-
-   5: xn =  a * y + p * x + 2 * sqr(x) * (1 - p) / (1 + sqr(x))
-      yn = -x + p * xn + 2 * y * xn * (1 - p) / (1 + y * xn)
-
-   6: xn =  a * y + p * x + 2 * sqr(x) * (1 - p) / (1 + sqr(x))
-      yn = -x + p * xn + 2 * sqr(y) * (1 - p) / (1 + sqr(y))
-
-   7: xn =  a * y + p * x + 2 * sqr(x) * (1 - p) / (1 + sqr(x))
-      yn = -x + p * xn + 2 * sqr(xn) * (y - p) / (1 + sqr(xn))
-
-   8: xn =  a * y + p * x + 2 * sqr(x) / (1 + sqr(x) + sqr(y))
-      yn = -x + p * xn + 2 * sqr(xn) * (1 - p) / (1 + sqr(xn))
-
-   9: xn =  a * y + p * x + 2 * sqr(x) * (1 - p) / (1 + sqr(x))
-      yn = -x + p * xn + p * sqr(xn) * (1 - p) / (1 + sqr(xn)) + sqr(p)
-
-  10: xn =  a * y + p * x + 2 * sqr(x) * (1 - p) / (1 + sqr(x))
-      yn = -x + p * xn + p * sqr(xn) * (1 - p) / (1 + sqr(xn)) + p
-
-  11: xn =  a * y + p * x + 2 * sqr(x) / (1 + sqr(xn) + sqr(y))
-      yn = -x + p * xn + p * sqr(xn) * (1 - p) / (1 + sqr(xn)) + p
-
-  12: xn =  a * y + p * x + 2 * sqr(x) * (1 - p) / (1 + sqr(x))
-      yn = -x + p * xn + p * y * xn * (1 - p) / (1 + sqr(xn)) + p
-
-  13: xn =  a * y + p * x + 2 * sqr(p) * (1 - x) / (1 + sqr(x))
-      yn = -x + p * xn + 2 * sqr(xn) * (1 - p) / (1 + sqr(xn))
-
-  14: xn =  a * y + p * x + 2 * sqr(p) * (1 - x) / (1 + sqr(x))
-      yn = -x + p * xn + p * sqr(xn) * (1 - p) / (1 + sqr(xn)) + p
-
-  15: xn =  a * y + p * x + 2 * sqr(x) * (1 - p) / (1 + sqr(x))
-      yn = -x + p * xn + 2 * sqr(xn) * (y - p) / (1 + sqr(xn)) + p
-
-  Positive values for p are allowed for formula 2,5,8,12,13,14.
-
-  *)
-
   case v.formula of
     1: begin
-         x := x - 1/sqrt(x*x+y*y)*(x * sign)/20000;
+         //x := x - 1/sqrt(x*x+y*y)*(x * sign)/20000;
+         //z := x;
+         //x := BB*y + W;
+         //W := AA*x - 2*x*x*(1 - AA) / (1 + x*x);
+         //y := W - z;
+
          z := x;
          x := BB*y + W;
-         W := AA*x - 2*x*x*(1 - AA) / (1 + x*x);
+         W := AA*x - (1 - AA)*2*x*x / (1 + x*x);
          y := W - z;
+
        end;
 
     2: begin
@@ -1009,6 +1010,164 @@ begin
         boundary_test;
         end;
 
+
+  (*
+  	//The following 15 formulas are from Michael Peters Plankton Explorer program
+
+    {formula #1}
+
+    x = -0.1
+    y =  0.0
+
+    p = { a random value between -1 and 1.
+          For some formulas it must be between -1 and 0,
+          but a value = 0 is not allowed }
+
+    a = { a value that is usually = 1.0.
+          With values above 1.0, most attractors 'explode',
+          with values below 1.0, most attractors 'implode'.
+          Try slight variations between 0.99 and 1.01 }
+
+    loop begin
+
+   1: xn =  a * y + p * x  + 2 * x * x * (1 - p) / (1 + x * x)
+      yn = -x + p * xn + 2 * xn * xn * (1 - p) / (1 + xn * xn)
+
+   2: xn =  a * y + p * x + 2 * sqr(x) * (1 - p) / (1 + sqr(x))
+      yn = -x + p * xn + 2 * y * xn * (1 - p) / (1 + sqr(xn))
+
+   3: xn:=  a * y + p * x + 2 * sqr(x) * (1 - p) / (1 + sqr(x));
+      yn:= -x + p * xn + 2 * sqr(xn) * (sqrt(abs(y)) - p) / (1 + sqr(xn));
+
+   4: xn =  a * y + p * x + 2 * sqr(x) * (1 - p) / (1 + sqr(x))
+      yn = -x + p * xn + 2 * sqr(xn) * (1 - p) / (1 + y * xn)
+
+   5: xn =  a * y + p * x + 2 * sqr(x) * (1 - p) / (1 + sqr(x))
+      yn = -x + p * xn + 2 * y * xn * (1 - p) / (1 + y * xn)
+
+   6: xn =  a * y + p * x + 2 * sqr(x) * (1 - p) / (1 + sqr(x))
+      yn = -x + p * xn + 2 * sqr(y) * (1 - p) / (1 + sqr(y))
+
+   7: xn =  a * y + p * x + 2 * sqr(x) * (1 - p) / (1 + sqr(x))
+      yn = -x + p * xn + 2 * sqr(xn) * (y - p) / (1 + sqr(xn))
+
+   8: xn =  a * y + p * x + 2 * sqr(x) / (1 + sqr(x) + sqr(y))
+      yn = -x + p * xn + 2 * sqr(xn) * (1 - p) / (1 + sqr(xn))
+
+   9: xn =  a * y + p * x + 2 * sqr(x) * (1 - p) / (1 + sqr(x))
+      yn = -x + p * xn + p * sqr(xn) * (1 - p) / (1 + sqr(xn)) + sqr(p)
+
+  10: xn =  a * y + p * x + 2 * sqr(x) * (1 - p) / (1 + sqr(x))
+      yn = -x + p * xn + p * sqr(xn) * (1 - p) / (1 + sqr(xn)) + p
+
+  11: xn =  a * y + p * x + 2 * sqr(x) / (1 + sqr(xn) + sqr(y))
+      yn = -x + p * xn + p * sqr(xn) * (1 - p) / (1 + sqr(xn)) + p
+
+  12: xn =  a * y + p * x + 2 * sqr(x) * (1 - p) / (1 + sqr(x))
+      yn = -x + p * xn + p * y * xn * (1 - p) / (1 + sqr(xn)) + p
+
+  13: xn =  a * y + p * x + 2 * sqr(p) * (1 - x) / (1 + sqr(x))
+      yn = -x + p * xn + 2 * sqr(xn) * (1 - p) / (1 + sqr(xn))
+
+  14: xn =  a * y + p * x + 2 * sqr(p) * (1 - x) / (1 + sqr(x))
+      yn = -x + p * xn + p * sqr(xn) * (1 - p) / (1 + sqr(xn)) + p
+
+  15: xn =  a * y + p * x + 2 * sqr(x) * (1 - p) / (1 + sqr(x))
+      yn = -x + p * xn + 2 * sqr(xn) * (y - p) / (1 + sqr(xn)) + p
+
+  Positive values for p are allowed for formula 2,5,8,12,13,14.
+
+  *)
+
+    41: begin
+        xn :=  BB * y + AA * x  + 2 * x * x * (1 - AA) / (1 + x * x);
+        y  := -x + BB * xn + 2 * xn * xn * (1 - AA) / (1 + xn * xn);
+        x  := xn;
+        end;
+
+    42: begin
+        xn :=  BB * y + AA * x + 2 * x * x * (1 - AA) / (1 + x * x);
+        y  := -x + AA * xn + 2 * y * xn * (1 - AA) / (1 + xn*xn);
+        x  := xn;
+        end;
+
+    43: begin
+        xn:=  BB * y + AA * x + 2 * x * x * (1 - AA) / (1 + x * x);
+        y := -x + AA * xn + 2 * xn * xn * (sqrt(abs(y)) - AA) / (1 + xn * xn);
+        x  := xn;
+        end;
+
+    44: begin
+        xn :=  BB * y + AA * x + 2 * x * x * (1 - AA) / (1 + x * x);
+        y  := -x + AA * xn + 2 * xn * xn * (1 - AA) / (1 + y * xn);
+        x  := xn;
+        end;
+
+    45: begin
+        xn :=  BB * y + AA * x + 2 *  x * x * (1 - AA) / (1 + x * x);
+        y  := -x + AA * xn + 2 * y * xn * (1 - AA) / (1 + y * xn);
+        x  := xn;
+        end;
+
+    46: begin
+        xn :=  BB * y + AA * x + 2 * x * x * (1 - AA) / (1 + x * x);
+        y  := -x + AA * xn + 2 * y * y * (1 - AA) / (1 + y * y);
+        x  := xn;
+        end;
+
+    47: begin
+        xn :=  BB * y + AA * x + 2 * x * x * (1 - AA) / (1 + x * x);
+        y  := -x + AA * xn + 2 * xn * xn * (y - AA) / (1 + xn * xn);
+        x  := xn;
+        end;
+
+    48: begin
+        xn :=  BB * y + AA * x + 2 * x * x / (1 + x * x + y * y);
+        y  := -x + AA * xn + 2 * xn * xn * (1 - AA) / (1 + xn * xn);
+        x  := xn;
+        end;
+
+    49: begin
+        xn :=  BB * y + AA * x + 2 * x * x * (1 - AA) / (1 + x * x);
+        y  := -x + AA * xn + AA * xn * xn * (1 - AA) / (1 + xn * xn) + AA * AA;
+        x  := xn;
+        end;
+
+    50: begin
+        xn :=  BB * y + AA * x + 2 * x * x * (1 - AA) / (1 + x * x);
+        y  := -x + AA * xn + AA * xn * xn * (1 - AA) / (1 + xn * xn) + AA;
+        x  := xn;
+        end;
+
+    51: begin
+        xn :=  BB * y + AA * x + 2 * x * x / (1 + xn * xn + y * y);
+        y  := -x + AA * xn + AA * xn * xn * (1 - AA) / (1 + xn * xn) + AA;
+        x  := xn;
+        end;
+
+    52: begin
+        xn :=  BB * y + AA * x + 2 * x * x * (1 - AA) / (1 + x * x);
+        y  := -x + AA * xn + AA * y * xn * (1 - AA) / (1 + xn * xn) + AA;
+        x  := xn;
+        end;
+
+    53: begin
+        xn :=  BB * y + AA * x + 2 * AA * AA * (1 - x) / (1 + x * x);
+        y  := -x + AA * xn + 2 * xn * xn * (1 - AA) / (1 + xn * xn);
+        x  := xn;
+        end;
+
+    54: begin
+        xn :=  BB * y + AA * x + 2 * AA * AA * (1 - x) / (1 + x * x);
+        y  := -x + AA * xn + AA * xn * xn * (1 - AA) / (1 + xn * xn) + AA;
+        x  := xn;
+        end;
+
+    55: begin
+        xn :=  BB * y + AA * x + 2 * x * x * (1 - AA) / (1 + x * x);
+        y  := -x + AA * xn + 2 * xn * xn * (y - AA) / (1 + xn * xn) + AA;
+        x  := xn;
+        end;
 
 	end;
 

@@ -1,0 +1,145 @@
+<HTML>
+<HEAD>
+  <!-- Created with AOLpress/2.0 -->
+  <TITLE>Gumowski Mira Formula, page 01</TITLE>
+</HEAD>
+<BODY>
+<P ALIGN=Center>
+<BIG><BIG><B>The Gumowski / Mira formula and
+Simulation</B></BIG></BIG><BR>
+By: Stephen C. Ferguson, January 25, 2000<BR>
+<P>
+A formula is named after the two Physicists (or mathematicians) that discovered
+it. Their names are Gumowski and Mira. &nbsp;They did experiments at the
+CERN research facility in Geneva Switzerland. &nbsp;They were trying to calculate
+(or simulate) the trajectories of elementary particles like protons that
+move at high speeds in an accelerator, a circular channel with the diameter
+of a tin can but several meters long. Gumowski and Mira used the formula
+to simulate the orbits of the particles.
+<P>
+One of the formulas that they used is as follows:<BR>
+<BR>
+X(n+1) = B*Y + F(X)<BR>
+Y(n+1) = -X + F(X(n+1))<BR>
+<BR>
+The function "F" is considered their model. &nbsp;One of the main functions
+they used for their model is:<BR>
+<BR>
+F(X) = A*X + (1-A)*2*X*X/(1+X*X)
+<P>
+in which "A" is a parameter to be chosen freely and is usually anywhere in
+the range of -1 to 1.&nbsp;"B" is a very sensitive constant and usually stays
+at a value that is very close to 1.000. &nbsp;If the constant "B" is slightly
+increased to a value of 1.001, then the trajectory will usually expand (or
+spiral outward to infinity). If the constant "B" is slightly decreased to
+something like a value of "0.999", then the trajectory will contract (or
+spiral inward) towards the attractor points.<BR>
+<BR>
+Another very important parameter is the initial starting point of the trajectory.
+This is sometimes called the "Seed" value. &nbsp;The seed is represented
+by the initial values of X and Y. &nbsp;Typical initial values of X and Y
+can be somewhere in the range of -20 to 20.
+<P>
+For "A=1", F(x) reduces to X. The model (F) is then completly regular, all
+is stable, and chaos is absent. As A deviates more from 1, more chaos will
+occur and the computer pictures get more interesting.
+<P>
+In summary, the formula can be written as follows:
+<P>
+X(n+1) = B*Y + F(n)<BR>
+Y(n+1) = -X + F(X(n+1))
+<P>
+where: F(n) = A*X + (1 - AA)*2*X*X) / (1 + Y*Y)
+<P>
+For programming purposes, this formula can be written as follows:
+<P>
+T = X<BR>
+X = B*Y + W<BR>
+W = A*X + (1 - A)*2*X*X/(1 + X*X)<BR>
+Y = W - T
+<P>
+The trajectories are then plotted on a 2 dimensional graph. The graph coordinates
+usually range from about -20 to 20 in the X axis and -20 to 20 in the Y axis.
+<P>
+The following are some images and that were&nbsp;created using this method:
+<P>
+<TABLE BORDER CELLPADDING="2">
+  <CAPTION>
+    gm-001.jpg
+  </CAPTION>
+  <TR>
+    <TD><P ALIGN=Center>
+      <IMG SRC="gm-001.jpg" WIDTH="400" HEIGHT="300" ALIGN="Middle"></TD>
+    <TD><P ALIGN=Left>
+      X = 14.717684295<BR>
+      Y = -13.660209039<BR>
+      A = -0.662358470<BR>
+      B = 1.000000000</TD>
+  </TR>
+</TABLE>
+<P ALIGN=Left>
+In the above image, the value of B is 1.000. &nbsp;The orbit seems to fall
+into a pattern of stability after several thousand iterations.
+<P ALIGN=Left>
+<TABLE BORDER CELLPADDING="2">
+  <CAPTION>
+    gm-002.jpg
+  </CAPTION>
+  <TR>
+    <TD><IMG SRC="gm-002.jpg" WIDTH="400" HEIGHT="300" ALIGN="Middle"></TD>
+    <TD>X = 5.000000000<BR>
+      Y = 5.000000000<BR>
+      A = 0.303981734<BR>
+      B = 0.999900000</TD>
+  </TR>
+</TABLE>
+<P>
+In the above image, the "B" parameter is equal to 0.9999, and the trajectory
+contracts (spirals inward) towards the attractor points which is represented
+by the light (white) color. &nbsp;For this image there are five atrractor
+points.<BR>
+<P>
+<TABLE BORDER CELLPADDING="2">
+  <TR>
+    <TD><IMG SRC="gm-003.jpg" WIDTH="400" HEIGHT="300" ALT="gm-003.jpg"></TD>
+    <TD>X = 19.945948645<BR>
+      Y = 4.749808544<BR>
+      A = -0.669105405<BR>
+      B = 1.000010000</TD>
+  </TR>
+</TABLE>
+<P>
+The above image shows a trajectory that is expanding to infinity. Note the
+value of B = 1.00001<BR>
+<BR>
+  <HR>
+<P>
+&copy; Copyright 2000 by Stephen C. Ferguson -
+<A HREF="http://home.hiwaay.net/~stephenf/" TARGET="_top">web page</A> -
+<A HREF="mailto:stephenf@hiwaay.net">email</A><BR>
+<P>
+  <HR>
+<P>
+Reference
+<P>
+1.) Endlessly Repeated Geometrical Figures by Hans Lauwerier, Princeton Science
+Library, 1991<BR>
+<BR>
+  <HR>
+<BR>
+
+<BR><BR><BR><BR><BR><BR><BR><BR><BR><BR>
+<FONT FACE="Verdana" SIZE=1 COLOR="#000000">
+<!-- The following is the call to the graphic-counter script -->
+<i>This page has been visited <b><!--#exec cgi="/cgi-bin/graphic-counter"--></b> times!</b>		
+		© <A HREF="http://www.creativemagazine.com/" TARGET="_top">Creative Magazine</A> 2000 <!--- Type your company name here --> <!--- End (company name)--></FONT>
+</FONT>
+
+<BR><BR>
+
+<P>
+<P>
+<P>
+<P>
+<P>
+</BODY></HTML>

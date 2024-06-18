@@ -32,8 +32,8 @@ Column2Width=125
 Create=1
 Visible=1
 State=0
-Left=23
-Top=114
+Left=5
+Top=115
 Width=304
 Height=623
 MaxLeft=-1
@@ -117,21 +117,21 @@ File_8=SourceModule,'C:\coolctls\faq026\unknown.pas',0,1,369,45,391,1,0
 File_9=SourceModule,'C:\coolctls\root_IFS\complex.pas',0,1,1,1,1,0,0
 
 [Modules]
-Module0=C:\coolctls\atriatix\formula.pas
-Module1=C:\coolctls\atriatix\Params.pas
+Module0=C:\coolctls\atriatix\Params.pas
+Module1=C:\coolctls\atriatix\Childwin.pas
 Module2=C:\coolctls\atriatix\about.pas
-Module3=C:\coolctls\atriatix\Childwin.pas
-Module4=C:\coolctls\atriatix\MAIN.PAS
+Module3=C:\coolctls\atriatix\MAIN.PAS
+Module4=C:\coolctls\atriatix\formula.pas
 Module5=C:\coolctls\atriatix\atriatix.dpr
 Count=6
 EditWindowCount=1
 
-[C:\coolctls\atriatix\formula.pas]
+[C:\coolctls\atriatix\Params.pas]
 ModuleType=SourceModule
-FormState=0
+FormState=1
 FormOnTop=0
 
-[C:\coolctls\atriatix\Params.pas]
+[C:\coolctls\atriatix\Childwin.pas]
 ModuleType=SourceModule
 FormState=1
 FormOnTop=0
@@ -139,16 +139,16 @@ FormOnTop=0
 [C:\coolctls\atriatix\about.pas]
 ModuleType=SourceModule
 FormState=1
-FormOnTop=1
-
-[C:\coolctls\atriatix\Childwin.pas]
-ModuleType=SourceModule
-FormState=1
-FormOnTop=1
+FormOnTop=0
 
 [C:\coolctls\atriatix\MAIN.PAS]
 ModuleType=SourceModule
 FormState=1
+FormOnTop=0
+
+[C:\coolctls\atriatix\formula.pas]
+ModuleType=SourceModule
+FormState=0
 FormOnTop=0
 
 [C:\coolctls\atriatix\atriatix.dpr]
@@ -160,18 +160,18 @@ FormOnTop=0
 Create=1
 Visible=1
 State=0
-Left=251
-Top=66
-Width=768
-Height=684
+Left=228
+Top=62
+Width=773
+Height=682
 MaxLeft=-1
 MaxTop=-1
-ClientWidth=760
-ClientHeight=657
+ClientWidth=765
+ClientHeight=655
 SplitPos=50
 MessagePane=0
 ViewCount=5
-CurrentView=4
+CurrentView=3
 View0=0
 View1=1
 View2=2
@@ -180,37 +180,37 @@ View4=4
 
 [View0]
 Module=C:\coolctls\atriatix\MAIN.PAS
-CursorX=37
-CursorY=120
-TopLine=112
+CursorX=26
+CursorY=245
+TopLine=236
 LeftCol=1
 
 [View1]
 Module=C:\coolctls\atriatix\Childwin.pas
-CursorX=25
-CursorY=1461
-TopLine=1454
+CursorX=10
+CursorY=479
+TopLine=473
 LeftCol=1
 
 [View2]
 Module=C:\coolctls\atriatix\about.pas
-CursorX=34
-CursorY=11
+CursorX=50
+CursorY=2
 TopLine=1
 LeftCol=1
 
 [View3]
 Module=C:\coolctls\atriatix\Params.pas
-CursorX=24
-CursorY=13
-TopLine=1
+CursorX=65
+CursorY=80
+TopLine=71
 LeftCol=1
 
 [View4]
 Module=C:\coolctls\atriatix\formula.pas
-CursorX=17
-CursorY=387
-TopLine=373
+CursorX=51
+CursorY=116
+TopLine=106
 LeftCol=1
 
 [Watches]

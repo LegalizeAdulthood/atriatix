@@ -201,10 +201,10 @@ begin
 	if ((abs(x) > 1e+4) and (abs(y) > 1e+4)) or
      ((abs(x) < 1e-4) and (abs(y) < 1e-4)) then
   begin
-  	x := v.RandomFactor*(random-0.5);
-    y := v.RandomFactor*(random-0.5);
-    x := x*x+y*y;
-  	x := v.RandomFactor*(random-0.5);
+  	x := 2*v.RandomFactor*(random-0.5);
+    y := 2*v.RandomFactor*(random-0.5);
+    //x := x*x+y*y;
+  	//y := -x;
     //x := sin(constPI*x);
     //y := sin(constPI*y);
   end;
@@ -212,10 +212,10 @@ begin
   (*
   if (abs(x) > 1e4) or (abs(y) > 1e4) then
   begin
-  	x := v.RandomFactor*(random-0.5);
-    y := v.RandomFactor*(random-0.5);
-    x := x*x+y*y;
-    y := -x;
+  	x := 2*v.RandomFactor*(random-0.5);
+    y := 2*v.RandomFactor*(random-0.5);
+    //x := x*x+y*y;
+    //y := -x;
     //x := sin(constPI*x);
     //y := sin(constPI*y);
   end;
@@ -365,20 +365,17 @@ end;
 
 procedure accumulate;
 begin
-
 	x1 := x;
   y1 := y;
-
-  //fx := 0;
-  //fy := 0;
 
   if v.bSpherical then
   begin
 		Spherical;
 		x := fx;
   	y := fy;
-
-	  //DrawPointArray;
+	  DrawPointArray;
+    x := x1;
+    y := y1;
   end;
 
 	if v.bSwirl then
@@ -386,7 +383,9 @@ begin
 	  Swirl;
 		x := fx;
   	y := fy;
-	  //DrawPointArray;
+	  DrawPointArray;
+    x := x1;
+    y := y1;
   end;
 
   if v.bSinusoidal then
@@ -394,7 +393,9 @@ begin
 		Sinusoidal;
 		x := fx;
   	y := fy;
-	  //DrawPointArray;
+	  DrawPointArray;
+    x := x1;
+    y := y1;
   end;
 
   if v.bPolar then
@@ -402,7 +403,9 @@ begin
 	  Polar;
 		x := fx;
   	y := fy;
-	  //DrawPointArray;
+	  DrawPointArray;
+    x := x1;
+    y := y1;
   end;
 
   if v.bHorseShoe then
@@ -410,7 +413,9 @@ begin
 	  HorseShoe;
 		x := fx;
   	y := fy;
-	  //DrawPointArray;
+	  DrawPointArray;
+    x := x1;
+    y := y1;
   end;
 
 	if v.bLinear then
@@ -418,7 +423,9 @@ begin
   	Linear;
 		x := fx;
   	y := fy;
-	  //DrawPointArray;
+	  DrawPointArray;
+    x := x1;
+    y := y1;
   end;
 
   if v.bBent then
@@ -426,23 +433,20 @@ begin
 	  Bent;
 		x := fx;
   	y := fy;
+	  DrawPointArray;
+    x := x1;
+    y := y1;
   end;
 
   if v.bNone then
   begin
   	None;
+		x := fx;
+  	y := fy;
+	  DrawPointArray;
+    x := x1;
+    y := y1;
   end;
-
-  DrawPointArray;
-
-	x := x1;
-  y := y1;
-
-	//x := fx;
-  //y := fy;
-
-  fx := x;
-  fy := y;
 
   if v.bInversion then
   begin
@@ -450,11 +454,17 @@ begin
 		x := fx;
   	y := fy;
 	  DrawPointArray;
+    x := x1;
+    y := y1;
   end;
 
-	x := x1;
-  y := y1;
-  
+  //DrawPointArray;
+
+	//x := x1;
+  //y := y1;
+
+  fx := x;
+  fy := y;
 
 end;
 
@@ -1743,8 +1753,8 @@ begin
 			    //xnew := (x*(AA+v.af[1 + j]) + y*(AA+v.af[3 + j]) + sign*(AA+v.af[5+j]));
 			    //ynew := (x*(AA+v.af[2 + j]) + y*(AA+v.af[4 + j]) + sign*(AA+v.af[6+j]));
 
-			    xnew := x*(v.af[1 + j] + y*(v.af[3 + j]) + (v.af[5+j]));
-			    ynew := x*(v.af[2 + j] + y*(v.af[4 + j]) + (v.af[6+j]));
+			    xnew := x*v.af[1 + j] + y*v.af[3 + j] + v.af[5+j];
+			    ynew := x*v.af[2 + j] + y*v.af[4 + j] + v.af[6+j];
 
           x := xnew;
           y := ynew;
@@ -1818,11 +1828,10 @@ end;
 
 procedure None;
 begin
-  //fx := fx + x;
-  //fy := fy + y;
-
-  x := fx+x;
-  y := fy+y;
+  fx := x;
+  fy := y;
+  //x := fx+x;
+  //y := fy+y;
 end;
 
 procedure Linear;
@@ -1834,10 +1843,10 @@ end;
 procedure Sinusoidal;
 begin
   // Sinusoidal
-  xnew := x + sin(x + sin(x));
-  ynew := y + sin(y + sin(y));
-  fx := v.dFactor2 * xnew;
-  fy := v.dFactor2 * ynew;
+  xnew := sin(x);
+  ynew := sin(y);
+  fx := fx + v.dFactor2 * xnew;
+  fy := fy + v.dFactor2 * ynew;
 end;
 
 procedure Spherical;
@@ -1858,14 +1867,8 @@ begin
 
   r2 := 1e-12+x*x+y*y;
 
-  //c1 := sin(r2);
-  //c2 := cos(r2);
-
   c1 := sin(r2);
   c2 := cos(r2);
-
-  //xnew := c1 * x - c2 * y;
-  //ynew := c2 * x + c1 * y;
 
   xnew := c1 * x - c2 * y;
   ynew := c2 * x + c1 * y;
@@ -1924,11 +1927,11 @@ end;
 
 procedure Inversion;
 begin
-	xnew := v.dFactor2*x/(x*x+y*y);
-  ynew := v.dFactor2*y/(x*x+y*y);
+	xnew := x/(x*x+y*y);
+  ynew := y/(x*x+y*y);
 
-  fx := 5*xnew;
-  fy := 5*ynew;
+  fx := xnew/(1e-12+v.dFactor2);
+  fy := ynew/(1e-12+v.dFactor2);
 end;
 
 end.

@@ -170,6 +170,8 @@ type
     Draw67: TMenuItem;
     Draw68: TMenuItem;
     Draw69: TMenuItem;
+    Edit1: TMenuItem;
+    Copy1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
     procedure UpdateMenuItems(Sender: TObject);
@@ -294,6 +296,7 @@ type
     procedure Draw67Click(Sender: TObject);
     procedure Draw68Click(Sender: TObject);
     procedure Draw69Click(Sender: TObject);
+    procedure Copy1Click(Sender: TObject);
 
   private
     { Private declarations }
@@ -347,7 +350,7 @@ const
   constTest         = 10000;
   constLMin         = -10.000;
 
-  constVersionNumber: String = 'Atriatix v0.005';
+  constVersionNumber: String = 'Atriatix v1.000';
 
   constBifurcation = 1;
   constRandom = 2;
@@ -440,11 +443,11 @@ begin
 
     v.formula := 70;
     v.dFactor1 := 10;
-    v.dFactor2 := 1.0;
+    v.dFactor2 := 0.1;
     v.RandomFactor := 2.0;
     v.bInitialize := True;
     v.bSqrt := False;
-    v.nCoefficients := 2;
+    v.nCoefficients := 3;
     v.BB := 1.0;
     v.cx := 5.0;
     v.cy := 5.0;
@@ -454,11 +457,11 @@ begin
     v.bModulas := false;
 
     // Scott Draves Flame functions
-    v.bNone        := False;
+    v.bNone        := True;
     v.bLinear      := False;
     v.bSinusoidal  := False;
     v.bSpherical   := False;
-    v.bSwirl       := False;
+    v.bSwirl       := True;
     v.bHorseshoe   := False;
     v.bPolar       := False;
     v.bBent        := False;
@@ -1565,7 +1568,7 @@ begin
   Form4.BluLabel1.Caption := Format('%F', [v.dBluStep]);
 
   v.dFactor1 := Round(Form4.Intensity.Position);
-  v.dFactor2 := Round(Form4.Factor2_bar.Position)*0.1;
+  v.dFactor2 := Round(Form4.Factor2_bar.Position)*0.01;
   v.RandomFactor := Round(Form4.Randomizer.Position)*0.2;
 
   Form4.Factor1.Caption := Format('%F', [v.dFactor1]);
@@ -1618,7 +1621,7 @@ begin
     Form4.Invert.Checked := v.bInvert;
 
     Form4.Intensity.Position := Round(v.dFactor1);
-    Form4.Factor2_bar.Position := Round(v.dFactor2*10.0);
+    Form4.Factor2_bar.Position := Round(v.dFactor2*100.0);
     Form4.Randomizer.Position := Round(v.RandomFactor)*5;
 
     Form4.Factor1.Caption := Format('%F', [v.dFactor1]);
@@ -2353,6 +2356,44 @@ begin
   v.aPG := ResultPG;
 end;
 
+procedure TMDIChild.Copy1Click(Sender: TObject);
+var
+   aPG: TPixelGraphic;
+   i: Integer;
+begin
+  aPG:=TPixelGraphic.Create;
+
+  PGImage1.Selection := False;
+  PGImage1.SelectionTop := 0;
+  PGImage1.SelectionLeft := 0;
+  PGImage1.SelectionWidth := v.width;
+  PGImage1.SelectionHeight := v.height;
+
+  try
+    with PGImage1.LendNoModifyPixelGraphic do
+      begin
+        aPG.SetDimension(v.Width, v.Height, BitCount);
+        //aPG.SetDimension(PGImage1.SelectionWidth, PGImage1.SelectionHeight, BitCount);
+        aPG.NumPaletteEntries:=NumPaletteEntries;
+        if NumPaletteEntries>0 then
+          for i:=0 to NumPaletteEntries-1 do
+            aPG.PaletteEntries[i]:=PaletteEntries[i];
+      end;
+      aPG.DrawRect(
+      0,
+      0,
+      aPG.Width,
+      aPG.Height,
+      PGImage1.SelectionLeft,
+      PGImage1.SelectionTop,
+      PGImage1.LendNoModifyPixelGraphic);
+      aPG.SaveToClipboard;
+  finally
+    aPG.Free;
+  end;
+  //CancelSelectionAndFreePixelGraphicToPaste;
+  UpDateMenuItems(Self);
+end;
 
 end.
 

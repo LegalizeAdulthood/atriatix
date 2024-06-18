@@ -1,0 +1,14 @@
+* text=auto
+*.atr text
+*.bat text
+*.dfm -text
+*.dof text
+*.dpl -text
+*.dpr text
+*.dsk text
+*.ICO -text
+*.ico -text
+*.PAS text
+*.pas text
+*.RES -text
+*.res -text

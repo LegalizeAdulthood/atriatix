@@ -1,0 +1,12 @@
+del *.pdb
+del *.sbr
+del *.bsc
+del *.pch
+del *.obj
+del *.aps 
+del *.ncb
+del *.zip
+del *.dcu
+del *.~df
+del *.~dp
+del *.~pa

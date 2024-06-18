@@ -111,6 +111,25 @@ type
     Modulas: TMenuItem;
     Expansion: TMenuItem;
     ColorMix: TMenuItem;
+    Formula2: TMenuItem;
+    Draw23: TMenuItem;
+    Draw24: TMenuItem;
+    Draw25: TMenuItem;
+    Draw26: TMenuItem;
+    Draw27: TMenuItem;
+    Draw28: TMenuItem;
+    Draw29: TMenuItem;
+    Draw30: TMenuItem;
+    Draw31: TMenuItem;
+    Draw32: TMenuItem;
+    Draw34: TMenuItem;
+    Draw35: TMenuItem;
+    Draw36: TMenuItem;
+    Draw37: TMenuItem;
+    Draw38: TMenuItem;
+    Draw39: TMenuItem;
+    Draw40: TMenuItem;
+    Draw33: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
     procedure UpdateMenuItems(Sender: TObject);
@@ -180,6 +199,24 @@ type
     procedure ModulasClick(Sender: TObject);
     procedure ExpansionClick(Sender: TObject);
     procedure ColorMixClick(Sender: TObject);
+    procedure Draw23Click(Sender: TObject);
+    procedure Draw24Click(Sender: TObject);
+    procedure Draw26Click(Sender: TObject);
+    procedure Draw27Click(Sender: TObject);
+    procedure Draw28Click(Sender: TObject);
+    procedure Draw29Click(Sender: TObject);
+    procedure Draw30Click(Sender: TObject);
+    procedure Draw31Click(Sender: TObject);
+    procedure Draw32Click(Sender: TObject);
+    procedure Draw34Click(Sender: TObject);
+    procedure Draw35Click(Sender: TObject);
+    procedure Draw36Click(Sender: TObject);
+    procedure Draw37Click(Sender: TObject);
+    procedure Draw38Click(Sender: TObject);
+    procedure Draw39Click(Sender: TObject);
+    procedure Draw40Click(Sender: TObject);
+    procedure Draw25Click(Sender: TObject);
+    procedure Draw33Click(Sender: TObject);
 
   private
     { Private declarations }
@@ -321,11 +358,11 @@ begin
     v.bInitialize := True;
     v.bSqrt := False;
     v.nCoefficients := 3;
-    v.BB := 1.00;
+    v.BB := 1.0;
 
-    v.bColorMix := true;
-    v.bExpansion := true;
-    v.bModulas := true;
+    v.bColorMix := false;
+    v.bExpansion := false;
+    v.bModulas := false;
 
     CreateTList;
 
@@ -442,6 +479,24 @@ begin
   Draw20.Checked := False;
   Draw21.Checked := False;
   Draw22.Checked := False;
+  Draw23.Checked := False;
+  Draw24.Checked := False;
+  Draw25.Checked := False;
+  Draw26.Checked := False;
+  Draw27.Checked := False;
+  Draw28.Checked := False;
+  Draw29.Checked := False;
+  Draw30.Checked := False;
+  Draw31.Checked := False;
+  Draw32.Checked := False;
+  Draw33.Checked := False;
+  Draw34.Checked := False;
+  Draw35.Checked := False;
+  Draw36.Checked := False;
+  Draw37.Checked := False;
+  Draw38.Checked := False;
+  Draw39.Checked := False;
+  Draw40.Checked := False;
 
   case v.formula of
   1: Draw01.Checked := True;
@@ -466,6 +521,24 @@ begin
   20: Draw20.Checked := True;
   21: Draw21.Checked := True;
   22: Draw22.Checked := True;
+  23: Draw23.Checked := True;
+  24: Draw24.Checked := True;
+  25: Draw25.Checked := True;
+  26: Draw26.Checked := True;
+  27: Draw27.Checked := True;
+  28: Draw28.Checked := True;
+  29: Draw29.Checked := True;
+  30: Draw30.Checked := True;
+  31: Draw31.Checked := True;
+  32: Draw32.Checked := True;
+  33: Draw33.Checked := True;
+  34: Draw34.Checked := True;
+  35: Draw35.Checked := True;
+  36: Draw36.Checked := True;
+  37: Draw37.Checked := True;
+  38: Draw38.Checked := True;
+  39: Draw39.Checked := True;
+  40: Draw40.Checked := True;
   end;
 
 end;
@@ -481,7 +554,7 @@ end;
 
 procedure TMDIChild.ResetCoordinates;
 begin
-  v.dMagnification := 0.1;
+  v.dMagnification := 0.01;
   v.dMag_new := v.dMagnification;
 
   v.CRMIN := -1;
@@ -1360,6 +1433,7 @@ end;
 
 procedure TMDIChild.Draw01Click(Sender: TObject);
 begin
+  v.BB := 1.00;
   v.bInitialize := True;
   v.formula := 1;
   UpdateGrafX;
@@ -1367,6 +1441,7 @@ end;
 
 procedure TMDIChild.Draw02Click(Sender: TObject);
 begin
+  v.BB := 1.005;
   v.bInitialize := True;
   v.formula := 2;
   UpdateGrafX;
@@ -1374,6 +1449,7 @@ end;
 
 procedure TMDIChild.Draw03Click(Sender: TObject);
 begin
+  v.BB := 1.005;
   v.bInitialize := True;
   v.formula := 3;
   UpdateGrafX;
@@ -1381,6 +1457,7 @@ end;
 
 procedure TMDIChild.Draw04Click(Sender: TObject);
 begin
+  v.BB := 1.00;
   v.bInitialize := True;
   v.formula := 4;
   UpdateGrafX;
@@ -1388,6 +1465,7 @@ end;
 
 procedure TMDIChild.Draw05Click(Sender: TObject);
 begin
+  v.BB := 1.005;
   v.bInitialize := True;
   v.formula := 5;
   UpdateGrafX;
@@ -1395,6 +1473,7 @@ end;
 
 procedure TMDIChild.Draw06Click(Sender: TObject);
 begin
+  v.BB := 1.005;
   v.bInitialize := True;
   v.formula := 6;
   UpdateGrafX;
@@ -1402,6 +1481,7 @@ end;
 
 procedure TMDIChild.Draw07Click(Sender: TObject);
 begin
+  v.BB := 1.005;
   v.bInitialize := True;
   v.formula := 7;
   UpdateGrafX;
@@ -1409,6 +1489,7 @@ end;
 
 procedure TMDIChild.Draw08Click(Sender: TObject);
 begin
+  v.BB := 1.005;
   v.bInitialize := True;
   v.formula := 8;
   UpdateGrafX;
@@ -1416,6 +1497,7 @@ end;
 
 procedure TMDIChild.Draw09Click(Sender: TObject);
 begin
+  v.BB := 1.005;
   v.bInitialize := True;
   v.formula := 9;
   UpdateGrafX;
@@ -1423,6 +1505,7 @@ end;
 
 procedure TMDIChild.Draw10Click(Sender: TObject);
 begin
+  v.BB := 1.005;
   v.bInitialize := True;
   v.formula := 10;
   UpdateGrafX;
@@ -1430,6 +1513,7 @@ end;
 
 procedure TMDIChild.Draw11Click(Sender: TObject);
 begin
+  v.BB := 1.005;
   v.bInitialize := True;
   v.formula := 11;
   UpdateGrafX;
@@ -1437,6 +1521,7 @@ end;
 
 procedure TMDIChild.Draw12Click(Sender: TObject);
 begin
+  v.BB := 1.00;
   v.bInitialize := True;
   v.formula := 12;
   UpdateGrafX;
@@ -1444,6 +1529,7 @@ end;
 
 procedure TMDIChild.Draw13Click(Sender: TObject);
 begin
+  v.BB := 1.00;
   v.bInitialize := True;
   v.formula := 13;
   UpdateGrafX;
@@ -1451,6 +1537,7 @@ end;
 
 procedure TMDIChild.Draw14Click(Sender: TObject);
 begin
+  v.BB := 1.00;
   v.bInitialize := True;
   v.formula := 14;
   UpdateGrafX;
@@ -1458,6 +1545,7 @@ end;
 
 procedure TMDIChild.Draw15Click(Sender: TObject);
 begin
+  v.BB := 1.00;
   v.bInitialize := True;
   v.formula := 15;
   UpdateGrafX;
@@ -1465,6 +1553,7 @@ end;
 
 procedure TMDIChild.Draw16Click(Sender: TObject);
 begin
+  v.BB := 1.00;
   v.bInitialize := True;
   v.formula := 16;
   UpdateGrafX;
@@ -1472,6 +1561,7 @@ end;
 
 procedure TMDIChild.Draw17Click(Sender: TObject);
 begin
+  v.BB := 1.00;
   v.bInitialize := True;
   v.formula := 17;
   UpdateGrafX;
@@ -1479,6 +1569,7 @@ end;
 
 procedure TMDIChild.Draw18Click(Sender: TObject);
 begin
+  v.BB := 1.00;
   v.bInitialize := True;
   v.formula := 18;
   UpdateGrafX;
@@ -1486,6 +1577,7 @@ end;
 
 procedure TMDIChild.Draw19Click(Sender: TObject);
 begin
+  v.BB := 1.00;
   v.bInitialize := True;
   v.formula := 19;
   UpdateGrafX;
@@ -1493,6 +1585,7 @@ end;
 
 procedure TMDIChild.Draw20Click(Sender: TObject);
 begin
+  v.BB := 1.00;
   v.bInitialize := True;
   v.formula := 20;
   UpdateGrafX;
@@ -1500,6 +1593,7 @@ end;
 
 procedure TMDIChild.Draw21Click(Sender: TObject);
 begin
+  v.BB := 1.00;
   v.bInitialize := True;
   v.formula := 21;
   UpdateGrafX;
@@ -1507,8 +1601,135 @@ end;
 
 procedure TMDIChild.Draw22Click(Sender: TObject);
 begin
+  v.BB := 1.005;
   v.bInitialize := True;
   v.formula := 22;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw23Click(Sender: TObject);
+begin
+  v.bInitialize := True;
+  v.formula := 23;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw24Click(Sender: TObject);
+begin
+  v.bInitialize := True;
+  v.formula := 24;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw25Click(Sender: TObject);
+begin
+  v.bInitialize := True;
+  v.formula := 25;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw26Click(Sender: TObject);
+begin
+  v.bInitialize := True;
+  v.formula := 26;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw27Click(Sender: TObject);
+begin
+  v.bInitialize := True;
+  v.formula := 27;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw28Click(Sender: TObject);
+begin
+  v.bInitialize := True;
+  v.formula := 28;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw29Click(Sender: TObject);
+begin
+  v.bInitialize := True;
+  v.formula := 29;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw30Click(Sender: TObject);
+begin
+  v.bInitialize := True;
+  v.formula := 30;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw31Click(Sender: TObject);
+begin
+  v.bInitialize := True;
+  v.formula := 31;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw32Click(Sender: TObject);
+begin
+  v.bInitialize := True;
+  v.formula := 32;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw33Click(Sender: TObject);
+begin
+  v.bInitialize := True;
+  v.formula := 33;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw34Click(Sender: TObject);
+begin
+  v.bInitialize := True;
+  v.formula := 34;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw35Click(Sender: TObject);
+begin
+  v.bInitialize := True;
+  v.formula := 35;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw36Click(Sender: TObject);
+begin
+  v.bInitialize := True;
+  v.formula := 36;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw37Click(Sender: TObject);
+begin
+  v.bInitialize := True;
+  v.formula := 37;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw38Click(Sender: TObject);
+begin
+  v.bInitialize := True;
+  v.formula := 38;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw39Click(Sender: TObject);
+begin
+  v.bInitialize := True;
+  v.formula := 39;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw40Click(Sender: TObject);
+begin
+  v.bInitialize := True;
+  v.formula := 40;
   UpdateGrafX;
 end;
 

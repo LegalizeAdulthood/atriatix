@@ -64,6 +64,7 @@ type
   procedure PixelMap;
   procedure mask_the_color_linear;
 	procedure coloring;
+  procedure boundary_test;
 
 implementation
 
@@ -127,12 +128,13 @@ begin
 
   while (v.Abort_Draw = False) do
   begin
-    if (abs(x) * abs(y)) > 1e5 then
+
+    if (abs(x) * abs(y)) > 1e10 then
     begin
-      //initialize_data;
+      initialize_data;
       //ShowMessage('start over');
-      //zero_init;
-      v.Abort_Draw := True;
+      zero_init;
+      //v.Abort_Draw := True;
     end
     else
     begin
@@ -145,8 +147,72 @@ begin
   bug := 1;
 end;
 
+procedure boundary_test;
+begin
+
+    (*
+    if ((abs(x) * abs(y)) > 1e5)  or ((abs(x) * abs(y)) < 1e-4) then
+    begin
+      //initialize_data;
+      //x := 0.1;
+      //y := 0.1;
+    end;
+    *)
+
+    //ShowMessage('start over');
+
+    if (abs(x) > 1e4) or (abs(x) < 1e-4) then
+    begin
+        x := 2*(random-0.5);
+        //x := 5+sin(constPI*x);
+    end;
+
+    if (abs(y) > 1e4) or (abs(y) < 1e-4) then
+    begin
+        y := 2*(random-0.5);
+        //y := 5+sin(constPI*y);
+    end;
+
+    if (v.nPoints mod 1000 = 0) then
+    begin
+      initialize_data;
+    end;
+
+    (*
+    //if x*x+y*y <= 1e-2 then
+    //begin
+      if abs(x) <= 1e-2 then
+      begin
+        x := sin(constPI*x);
+      end;
+
+      if abs(y) <= 1e-2 then
+      begin
+        y := sin(constPI*y);
+      end;
+    //end;
+
+    //if x*x+y*y > 1e2 then
+    //begin
+      if abs(x) > 1e5 then
+      begin
+        x := sin(constPI*x);
+      end;
+
+      if abs(y) > 1e5 then
+      begin
+        y := sin(constPI*y);
+      end;
+    //end;
+    *)
+    
+    //end;
+end;
+
 procedure initialize_data;
 begin
+  //ShowMessage('initialize');
+
   Randomize;
   v.Lyapunov := 0.0;
   v.T1 := 0;
@@ -160,11 +226,23 @@ begin
 
   v.bInitialize := false;
 
-  AA := 0.8*v.RandomFactor*(random);
+  AA := v.RandomFactor*(random);
   v.C  := AA;
   v.AA := AA;
   v.AA_Initial := AA;
-  W := 1;
+  W := 0;
+
+  //x := v.RandomFactor*(v.RandomFactor*(random)-0.5);
+  //y := v.RandomFactor*(v.RandomFactor*(random)-0.5);
+
+  x := v.RandomFactor*(random);
+  y := v.RandomFactor*(random);
+
+  //x := 10;
+  //y := 10;
+
+  fx := x;
+  fy := y;
 
   sign := 1;
 
@@ -184,16 +262,13 @@ begin
   //y := 1e1;
   //z := 1e-1;
 
-  x := -1.5;
-  y := 0;
-
-  fx := x;
-  fy := y;
-
   if v.Width >= v.Height then
     nsq := v.Width
   else
     nsq := v.Height;
+
+  x := fx;
+  y := fy;
 
   nx := 0;
   while nx < nsq do  // width
@@ -306,7 +381,10 @@ begin
   if (nx >= 0) and (nx < v.iWidth) and (ny >= 0) and (ny < v.iHeight) then
   begin
     begin
-      LSum := abs(sin(constPI*arctan((1+x-x_save)/(1+y-y_save))));
+      //LSum := abs(sin(constPI*arctan((1+x-x_save)/(1+y-y_save))));
+
+      //LSum := abs(sin(constPI*((1+x-x_save)+(1+y-y_save))));
+      LSum := 1;
 
       Pointer(my_Counter) := v.my_TList[nx*(v.Width-1)+ny];
       my_Counter := my_Counter + Round(10+v.dFactor1 * LSum);
@@ -314,6 +392,23 @@ begin
 
       TListUpdate;
       coloring;
+
+      (*
+      Pix := v.aPG.Bits[nx, ny];
+
+      r := GetRValue(Pix) and $FF;
+      g := GetGValue(Pix) and $FF;;
+      b := GetBValue(Pix) and $FF;
+
+      if (r > red) then
+        red := Round(r);
+
+      if (g > grn) then
+        grn := Round(g);
+
+      if (b > blu) then
+        blu := Round(b);
+      *)
 
       Pixel := RGB(red, grn, blu);
       v.aPG.Bits[nx, ny] := Pixel;
@@ -506,11 +601,12 @@ end;
 
 procedure Mira_01;
 begin
-  if (v.nPoints mod 10000 = 0) then
+  if (v.nPoints mod 1000 = 0) then
   begin
     if (v.bModulas = true) then
       v.AA := V.AA - 0.01*sin(V.AA);
     kicker := kicker + 1;
+    //initialize_data;
   end;
 
   if (v.bExpansion = true) then
@@ -546,7 +642,7 @@ begin
     sign := 1
   else
     sign := -1;
-  
+
   x_save := x;
   y_save := y;
 
@@ -728,6 +824,18 @@ begin
         xn := BB*y + AA * x + 2 * x*x * (1 - AA) /(1 + x*x);
         y  := -x + AA * xn + 2 * y * y * (1 - AA) / (1 + y * y);
         x  := xn;
+
+         //xn := - x/2 + y  + 100*sin((x/5))/sqrt(abs(x*x + y*y));  //
+
+         //y :=  -x;
+         //x  := xn;
+
+         //z := x;
+         //x := BB*y+W;
+         //W := AA*x + sign*((constPI - AA)*x*x)/(1 + x*x);
+         //y := W - z;
+         //boundary_test;
+
         end;
 
     17: begin
@@ -773,6 +881,134 @@ begin
         W := AA*x - 20*AA*x*x*(1 - AA) / (1 + x*x+sin(1+x));
         y := W - z;
         end;
+
+    23: begin
+        xn := -constPI / 2.0 * x + y + 100. * x / (x * x + 2.0);
+        y :=  -x;
+        x  := xn;
+        boundary_test;
+        end;
+
+    24: begin
+        xn := -x/2 + y + 100. * x / (x * x + 1.0);
+        y  :=  -x;
+        x  := xn;
+        boundary_test;
+        end;
+
+    25: begin
+        xn := -x/2 + y + sign*((x - AA) * (x + y))/(x*x + y*y);
+        y  :=  -x;
+        x  := xn;
+        boundary_test;
+        end;
+
+    26: begin
+        xn := -x/2 + y + sign * 10 * x  / (x * x + 1);
+        y  :=  -x;
+        x  := xn;
+        boundary_test;
+        end;
+
+    27: begin
+        xn := -x/2 + y + sign * (2 - constPI * x)  / (x * x + 2);
+        y  := -x;
+        x  := xn;
+        boundary_test;
+        end;
+
+    28: begin
+        xn := -x/8 + y + sign * (2 - constPI * x)  / (x * x + 2);
+        y  := -x;
+        x  := xn;
+        boundary_test;
+        end;
+
+    29: begin
+        xn := -sign*x/2 + y + 100 * (x - y)*(constPI - sin(x))*AA  / (x*x + y*y);
+        y  := -x;
+        x  := xn;
+        boundary_test;
+        end;
+
+    30: begin
+        xn := -x/2 + y + 100 * (x - y)  / (x * x + y * y );  // z113
+        y  := -x;
+        x  := xn;
+        boundary_test;
+        end;
+
+    31: begin
+        xn := -x/2 + y + 100 * ((x - y)/2 + sin(x - y))  / (x * x + y * y );
+        y  := -x;
+        x  := xn;
+        boundary_test;
+        end;
+
+    32: begin
+        //xn := x/2 + y  + y/2;
+        xn := x/2 + y  + (1 - x)/abs(x*x - y);    // z107
+        y  := -x;
+        x  := xn;
+        boundary_test;
+        end;
+
+    33: begin
+        xn := x/2 + y  + (sign - x)/abs(x*x + y);  // z108
+        y  := -x;
+        x  := xn;
+        boundary_test;
+        end;
+
+    34: begin
+        xn := x/2 + y  + 20*(sign + x)/(sqrt(1+abs(x*x + y*y)));   // z109
+        y  := -x;
+        x  := xn;
+        boundary_test;
+        end;
+
+    35: begin
+        xn := x/2 + y  + (50*sign - x)/sqrt(abs(x*x + y*y));   // z110
+        y  := -x;
+        x  := xn;
+        boundary_test;
+        end;
+
+    36: begin
+        xn := -x/3 + y  + 10*(1 - x)/sqrt(abs(x*x + y*y));   // S - letter
+        y  := -x;
+        x  := xn;
+        boundary_test;
+        end;
+
+    37: begin
+        xn := x/2 + y + AA*10*abs(x - y)/(x+abs(x*x + y*y)/10); // z111
+        y  := -x;
+        x  := xn;
+        boundary_test;
+        end;
+
+    38: begin
+        xn := -x/1.1 + y  + 10*abs(x - y)/(abs(x*x/10 + y*y/10)); // z111
+        y  := -x;
+        x  := xn;
+        boundary_test;
+        end;
+
+    39: begin
+        xn := x/1.2 + y  + 100*abs(x - y)/abs(x*x + y*y);  // z112
+        y  := -x;
+        x  := xn;
+        boundary_test;
+        end;
+
+    40: begin
+        xn := -x/1.01 + y  + 100*sin(constPI+x)/abs(x*x + y*y);  // z113
+        y  := -x;
+        x  := xn;
+        boundary_test;
+        end;
+
 
 	end;
 

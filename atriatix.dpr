@@ -9,7 +9,8 @@ uses
   Childwin in 'Childwin.pas' {MDIChild},
   Params in 'Params.pas' {Form4},
   Coefficients in 'Coefficients.pas' {CForm},
-  LMString in 'Lmstring.pas';
+  LMString in 'Lmstring.pas',
+  complex in 'complex.pas';
 
 {$R *.RES}
 

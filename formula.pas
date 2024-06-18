@@ -36,7 +36,7 @@ type
     AA, BB, C, Lyapunov: double;
     AA_Initial: double;
 
-    bNone, bLinear, bSinusoidal, bSpherical, bSwirl, bHorseshoe, bPolar, bBent: Bool;
+    bNone, bLinear, bSinusoidal, bSpherical, bSwirl, bHorseshoe, bPolar, bBent, bInversion: Bool;
     bInvert: Bool;
 
     bInitialize: Bool;
@@ -77,6 +77,7 @@ type
   procedure Horseshoe;
   procedure Polar;
   procedure Bent;
+	procedure Inversion;
 
 implementation
 
@@ -87,8 +88,6 @@ var
 
   //x1, x2, x3, x4: double;
   //y1, y2, y3, y4: double;
-
-  x2, y2: double;
 
   a: double;
 
@@ -155,7 +154,12 @@ begin
   while (v.Abort_Draw = False) do
   begin
 
-    if (abs(x) * abs(y)) > 1e10 then
+    draw_points;
+
+    (*
+    //if (abs(x) * abs(y)) > 1e10 then
+		if ((abs(x) > 1e+4) and (abs(y) > 1e+4)) or
+       ((abs(x) < 1e-4) and (abs(y) < 1e-4)) then
     begin
       //initialize_data;
       //ShowMessage('start over');
@@ -166,6 +170,7 @@ begin
     begin
       draw_points;
     end;
+    *)
 
     Application.ProcessMessages;
   end;
@@ -193,25 +198,28 @@ end;
 
 procedure boundary_test_2;
 begin
-	if (abs(x) <= 1e-3) or (abs(y) <= 1e-3) then
+	if ((abs(x) > 1e+4) and (abs(y) > 1e+4)) or
+     ((abs(x) < 1e-4) and (abs(y) < 1e-4)) then
   begin
-  	x := random-0.5;
-    y := random-0.5;
-    //x := x*x+y*y;
-    //y := -x;
-    //x := 2*v.RandomFactor*sin(constPI*x);
-    //y := 2*v.RandomFactor*sin(constPI*y);
+  	x := v.RandomFactor*(random-0.5);
+    y := v.RandomFactor*(random-0.5);
+    x := x*x+y*y;
+  	x := v.RandomFactor*(random-0.5);
+    //x := sin(constPI*x);
+    //y := sin(constPI*y);
   end;
 
-  if (abs(x) > 1e3) or (abs(y) > 1e3) then
+  (*
+  if (abs(x) > 1e4) or (abs(y) > 1e4) then
   begin
-  	x := random-0.5;
-    y := random-0.5;
-    //x := x*x+y*y;
-    //y := -x;
-    //x := 2*v.RandomFactor*sin(constPI*x);
-    //y := 2*v.RandomFactor*sin(constPI*y);
+  	x := v.RandomFactor*(random-0.5);
+    y := v.RandomFactor*(random-0.5);
+    x := x*x+y*y;
+    y := -x;
+    //x := sin(constPI*x);
+    //y := sin(constPI*y);
   end;
+  *)
 end;
 
 procedure initialize_data;
@@ -222,7 +230,6 @@ begin
   v.Lyapunov := 0.0;
   v.T1 := 0;
   i := 1;
-
   while (i <= 60) do
   begin
     v.af[i] := v.RandomFactor*(Random - 0.5);    // 9.0
@@ -230,28 +237,6 @@ begin
     inc(i);
   end;
 
-  (*
-  while (i <= 20) do
-  begin
-    j := 0;
-	  while (j <= 2) do
-  	begin
-      if j = 0 then
-      begin
-	    	v.af[i+j*20] := v.RandomFactor*(Random - 0.5);
-  	  	v.bf[i+j*20] := v.RandomFactor*(Random - 0.5);
-      end
-      else
-      begin
-	    	v.af[i+j*20] := v.af[1] * v.af[1];
-  	  	v.bf[i+j*20] := v.bf[1] * v.bf[1];
-      end;
-    	inc(j);
-    end;
-    inc(i);
-  end;
-  *)
-  
   v.bInitialize := false;
 
   AA := v.RandomFactor*(random-0.5);
@@ -267,8 +252,8 @@ begin
   //x := v.RandomFactor*(v.RandomFactor*(random)-0.5);
   //y := v.RandomFactor*(v.RandomFactor*(random)-0.5);
 
-  x := 2*v.RandomFactor*(random-0.5);
-  y := 2*v.RandomFactor*(random-0.5);
+  x := v.RandomFactor*(random-0.5);
+  y := v.RandomFactor*(random-0.5);
 
   //x := -1.25;
   //y := 1.25;
@@ -353,10 +338,10 @@ begin
     3: j := Round(Random * 3*20);
   end;
 
-  if (j <= 20) then
+  if (j < 19) then
     j := 0
   else
-  if (j <= 40) then
+  if (j < 39) then
     j := 19
   else
     j := 39;
@@ -375,6 +360,101 @@ begin
 
   //x := xnew;
   //y := ynew;
+
+end;
+
+procedure accumulate;
+begin
+
+	x1 := x;
+  y1 := y;
+
+  //fx := 0;
+  //fy := 0;
+
+  if v.bSpherical then
+  begin
+		Spherical;
+		x := fx;
+  	y := fy;
+
+	  //DrawPointArray;
+  end;
+
+	if v.bSwirl then
+  begin
+	  Swirl;
+		x := fx;
+  	y := fy;
+	  //DrawPointArray;
+  end;
+
+  if v.bSinusoidal then
+  begin
+		Sinusoidal;
+		x := fx;
+  	y := fy;
+	  //DrawPointArray;
+  end;
+
+  if v.bPolar then
+  begin
+	  Polar;
+		x := fx;
+  	y := fy;
+	  //DrawPointArray;
+  end;
+
+  if v.bHorseShoe then
+  begin
+	  HorseShoe;
+		x := fx;
+  	y := fy;
+	  //DrawPointArray;
+  end;
+
+	if v.bLinear then
+  begin
+  	Linear;
+		x := fx;
+  	y := fy;
+	  //DrawPointArray;
+  end;
+
+  if v.bBent then
+  begin
+	  Bent;
+		x := fx;
+  	y := fy;
+  end;
+
+  if v.bNone then
+  begin
+  	None;
+  end;
+
+  DrawPointArray;
+
+	x := x1;
+  y := y1;
+
+	//x := fx;
+  //y := fy;
+
+  fx := x;
+  fy := y;
+
+  if v.bInversion then
+  begin
+  	Inversion;
+		x := fx;
+  	y := fy;
+	  DrawPointArray;
+  end;
+
+	x := x1;
+  y := y1;
+  
 
 end;
 
@@ -461,7 +541,6 @@ begin
   if (blu < 0) then
     blu := 0;
 
-
   Pixel := RGB(red, grn, blu);
 
   red := red_save;
@@ -472,28 +551,22 @@ end;
 
 procedure DrawPointArray;
 begin
-	x2 := x;
-	y2 := y;
-
-  x := fx;
-  y := fy;
-
   PixelMap;
 
   if (nx >= 0) and (nx < v.iWidth) and (ny >= 0) and (ny < v.iHeight) then
   begin
     begin
 
-      LSum := abs(1+x*x+y*y);
+      //LSum := abs(0.5+x*x+y*y);
 
       //LSum := abs(arctan((1+x-x_save)/(1+y-y_save)));
 			//LSum := sin(constPI*LSum+sin(constPI*LSum));
 
-      //LSum := abs(sin(constPI*arctan((1+x-x_save)/(1+y-y_save))));
+      //LSum := 10*(1+abs(sin(constPI*arctan((1+x-x_save)/(1+y-y_save)))));
 
       //LSum := abs(constPI*arctan((1+x-x_save)/(1+y-y_save)));
 
-      //LSum := abs(sin(constPI*((1+x-x_save)+(1+y-y_save))));
+      LSum := abs(sin(constPI*((1+x-x_save)+(1+y-y_save))));
       //LSum := 1;
 
       Pointer(my_Counter) := v.my_TList[nx*(v.Width-1)+ny];
@@ -682,9 +755,6 @@ begin
     end;
   end;
 
-  x := x2;
-  y := y2;
-
 end;
 
 procedure coloring;
@@ -728,25 +798,9 @@ begin
     blu := 255;
 
   tmp := Round((red+grn+blu)*0.33);
-
-  //if j = 0 then
-  //begin
-
   red := tmp + Round(v.dRedStep);
   grn := tmp + Round(v.dGrnStep);
   blu := tmp + Round(v.dBluStep);
-
-  //end
-  //else
-  //begin
-	  //red := tmp - Round(v.dRedStep);
-  	//grn := tmp - Round(v.dGrnStep);
-  	//blu := tmp - Round(v.dBluStep);
-	//end;
-
-  //Pix := v.aPG.Bits[nx, ny];
-  //average_pixel;
-  //v.aPG.Bits[nx, ny] := Pixel;
 
   if (red > 255) then
     red := 255;
@@ -1682,9 +1736,19 @@ begin
 			end;
 
     70: begin
-	  		  z := x*v.af[1 + j] + y*v.af[2 + j] + v.af[3 + j];
-  	  		y := x*v.af[4 + j] + y*v.af[5 + j] + v.af[6 + j];
-          x := z;
+	  		  //z := x*v.af[1 + j] + y*v.af[2 + j] + v.af[3 + j];
+  	  		//y := x*v.af[4 + j] + y*v.af[5 + j] + v.af[6 + j];
+          //x := z;
+
+			    //xnew := (x*(AA+v.af[1 + j]) + y*(AA+v.af[3 + j]) + sign*(AA+v.af[5+j]));
+			    //ynew := (x*(AA+v.af[2 + j]) + y*(AA+v.af[4 + j]) + sign*(AA+v.af[6+j]));
+
+			    xnew := x*(v.af[1 + j] + y*(v.af[3 + j]) + (v.af[5+j]));
+			    ynew := x*(v.af[2 + j] + y*(v.af[4 + j]) + (v.af[6+j]));
+
+          x := xnew;
+          y := ynew;
+
     		end;
 
     71: begin
@@ -1696,7 +1760,7 @@ begin
     72: begin
          	z := x;
 			   	x := BB*y+W;
-	  		  x := v.af[1 + j]*sign*(x+y);
+	  		  W := AA*sign*(x+y);
     			y := W - z;
     		end;
 
@@ -1752,86 +1816,13 @@ begin
 
 end;
 
-procedure accumulate;
-begin
-
-	x1 := x;
-  y1 := y;
-
-  fx := 0;
-  fy := 0;
-
-  //fx := x;
-  //fy := y;
-
-  if v.bNone then
-  begin
-  	None;
-	  DrawPointArray;
-  end;
-
-  if v.bSpherical then
-  begin
-		Spherical;
-	  DrawPointArray;
-  end;
-
-	if v.bSwirl then
-  begin
-	  Swirl;
-	  DrawPointArray;
-  end;
-
-  if v.bSinusoidal then
-  begin
-		Sinusoidal;
-	  DrawPointArray;
-  end;
-
-  if v.bBent then
-  begin
-  	Bent;
-	  DrawPointArray;
-  end;
-
-  if v.bPolar then
-  begin
-	  Polar;
-	  DrawPointArray;
-  end;
-
-  if v.bHorseShoe then
-  begin
-	  HorseShoe;
-	  DrawPointArray;
-  end;
-
-	if v.bLinear then
-  begin
-  	Linear;
-	  DrawPointArray;
-  end;
-
-	//fx := fx + v.RandomFactor*(Random - 0.5);
-	//fy := fy + v.RandomFactor*(Random - 0.5);
-
-  //x := fx;
-  //y := fy;
-
-  //DrawPointArray;
-
-	x := x1;
-  y := y1;
-
-  //fx := x;
-  //fy := y;
-
-end;
-
 procedure None;
 begin
-  fx := x;
-	fy := y;
+  //fx := fx + x;
+  //fy := fy + y;
+
+  x := fx+x;
+  y := fy+y;
 end;
 
 procedure Linear;
@@ -1843,32 +1834,38 @@ end;
 procedure Sinusoidal;
 begin
   // Sinusoidal
-  xnew := sin(x);
-  ynew := sin(y);
-  fx := fx + v.dFactor2 * xnew;
-  fy := fy + v.dFactor2 * ynew;
+  xnew := x + sin(x + sin(x));
+  ynew := y + sin(y + sin(y));
+  fx := v.dFactor2 * xnew;
+  fy := v.dFactor2 * ynew;
 end;
 
 procedure Spherical;
 begin
   // ----- SPHERICAL -----
-  r2 := 1e-6+x*x+y*y;
+  r2 := 1e-12+x*x+y*y;
 
-  xnew := fx/r2 + x/r2;
-  ynew := fy/r2 + y/r2;
+  xnew := x/r2;
+  ynew := y/r2;
 
-  fx := v.dFactor2 * (fx + xnew);
-  fy := v.dFactor2 * (fy + ynew);
+  fx := fx + v.dFactor2 * xnew;
+  fy := fy + v.dFactor2 * ynew;
 end;
 
 procedure Swirl;
 begin
   // ----- SWIRL -----
 
-  r2 := 1e-6+x*x+y*y;
+  r2 := 1e-12+x*x+y*y;
+
+  //c1 := sin(r2);
+  //c2 := cos(r2);
 
   c1 := sin(r2);
   c2 := cos(r2);
+
+  //xnew := c1 * x - c2 * y;
+  //ynew := c2 * x + c1 * y;
 
   xnew := c1 * x - c2 * y;
   ynew := c2 * x + c1 * y;
@@ -1882,7 +1879,7 @@ begin
   // ----- HORSESHOE -----
   if ((x < -constZeroTol) or (x > constZeroTol) or
       (y < -constZeroTol) or (y > constZeroTol)) then
-    a := ArcTan(x/(1e-6+y))
+    a := ArcTan(x/y)
   else
     a := 0.0;
 
@@ -1901,11 +1898,11 @@ begin
   // ----- POLAR -----
   if ((x < -constZeroTol) or (x > constZeroTol) or
       (y < -constZeroTol) or (y > constZeroTol)) then
-    xnew := ArcTan(x/(1e-6+y)) / constPI
+    xnew := ArcTan(x/y) / constPI
   else
     xnew := 0.0;
 
-  ynew := sqrt(1e-6 + x*x + y*y) - 1.0;
+  ynew := sqrt(1e-12 + x*x + y*y) - 1.0;
 
   fx := fx + v.dFactor2 * xnew;
   fy := fy + v.dFactor2 * ynew;
@@ -1925,5 +1922,13 @@ begin
   fy := fy + v.dFactor2 * ynew;
 end;
 
+procedure Inversion;
+begin
+	xnew := v.dFactor2*x/(x*x+y*y);
+  ynew := v.dFactor2*y/(x*x+y*y);
+
+  fx := 5*xnew;
+  fy := 5*ynew;
+end;
 
 end.

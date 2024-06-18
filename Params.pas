@@ -53,6 +53,7 @@ type
     Factor2_bar: TCoolTrackBar;
     None: TCoolCheckRadioBox;
     CoolLabel10: TCoolLabel;
+    Inversion: TCoolCheckRadioBox;
     procedure ColorTimerTimer(Sender: TObject);
     procedure RedBar1Change(Sender: TObject);
     procedure GrnBar1Change(Sender: TObject);
@@ -228,6 +229,7 @@ procedure TForm4.ToolbarButton972Click(Sender: TObject);
 begin
   MainForm.StopButtonClick(Self);
 end;
+
 
 
 end.

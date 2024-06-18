@@ -42,7 +42,7 @@ type
     AA, BB, C, Lyapunov: double;
     AA_Initial: double;
 
-    bNone, bLinear, bSinusoidal, bSpherical, bSwirl, bHorseshoe, bPolar, bBent: Bool;
+    bNone, bLinear, bSinusoidal, bSpherical, bSwirl, bHorseshoe, bPolar, bBent, bInversion: Bool;
     bInvert: Bool;
 
     bInitialize: Bool;
@@ -444,7 +444,7 @@ begin
     v.RandomFactor := 2.0;
     v.bInitialize := True;
     v.bSqrt := False;
-    v.nCoefficients := 3;
+    v.nCoefficients := 2;
     v.BB := 1.0;
     v.cx := 5.0;
     v.cy := 5.0;
@@ -454,7 +454,7 @@ begin
     v.bModulas := false;
 
     // Scott Draves Flame functions
-    v.bNone        := True;
+    v.bNone        := False;
     v.bLinear      := False;
     v.bSinusoidal  := False;
     v.bSpherical   := False;
@@ -462,7 +462,8 @@ begin
     v.bHorseshoe   := False;
     v.bPolar       := False;
     v.bBent        := False;
-    
+    v.bInversion   := False;
+
     CreateTList;
 
     UpdateGrafX;  // call this to automatically start-up
@@ -722,6 +723,7 @@ end;
 procedure TMDIChild.ResetCoordinates;
 begin
   v.dMagnification := 0.01;
+  //v.dMagnification := 1.0;
   v.dMag_new := v.dMagnification;
 
   v.CRMIN := -1;
@@ -977,6 +979,7 @@ begin
     if v.bHorseshoe then WriteLn(OutFile, IntToStr(1)) else  WriteLn(OutFile, IntToStr(0));
     if v.bPolar then WriteLn(OutFile, IntToStr(1)) else  WriteLn(OutFile, IntToStr(0));
     if v.bBent then WriteLn(OutFile, IntToStr(1)) else  WriteLn(OutFile, IntToStr(0));
+    if v.bInversion then WriteLn(OutFile, IntToStr(1)) else  WriteLn(OutFile, IntToStr(0));
 
     CloseFile(OutFile);
 
@@ -1241,6 +1244,13 @@ try
       v.bBent := True
     else
       v.bBent := False;
+
+  ReadFromParameterFile(Self);
+  if bValid = True then
+    if InString = '1' then
+      v.bInversion := True
+    else
+      v.bInversion := False;
 
 except
   ShowMessage('Error reading parameter file');
@@ -1578,6 +1588,7 @@ begin
   v.bHorseshoe   := Form4.Horseshoe.Checked;
   v.bPolar       := Form4.Polar.Checked;
   v.bBent        := Form4.Bent.Checked;
+  v.bInversion   := Form4.Inversion.Checked;
 
 end;
 
@@ -1628,6 +1639,7 @@ begin
     Form4.Horseshoe.Checked  := v.bHorseshoe;
     Form4.Polar.Checked      := v.bPolar;
     Form4.Bent.Checked       := v.bBent;
+    Form4.Inversion.Checked  := v.bInversion;
 
     CForm.A01.Value := v.af[01];
     CForm.A02.Value := v.af[02];

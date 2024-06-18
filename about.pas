@@ -12,6 +12,7 @@ type
     Dock971: TDock97;
     Toolbar971: TToolbar97;
     CloseButton: TToolbarButton97;
+    CoolLabel1: TCoolLabel;
     procedure OKButtonClick(Sender: TObject);
   private
     { Private declarations }

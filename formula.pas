@@ -65,6 +65,7 @@ type
   //procedure mask_the_color_linear;
 	procedure coloring;
   procedure boundary_test;
+	procedure average_pixel;
 
 implementation
 
@@ -72,7 +73,13 @@ var
   v: pDataPointer;
   x, y, z: Double;
 
+  //x1, x2, x3, x4: double;
+  //y1, y2, y3, y4: double;
+
+  a: double;
+
   Pixel: TRGB;
+  Pix: TRGB;
 
   LSum: double;
   tx, ty: Double;
@@ -82,6 +89,8 @@ var
 
   //xnew, ynew, znew: double;
   xnew: double;
+  //ynew: double;
+
   my_Index: double;
   my_Counter: integer;
 
@@ -129,7 +138,7 @@ begin
   while (v.Abort_Draw = False) do
   begin
 
-    if (abs(x) * abs(y)) > 1e10 then
+    if (abs(x) * abs(y)) > 1e12 then
     begin
       //initialize_data;
       //ShowMessage('start over');
@@ -228,7 +237,8 @@ begin
 
   AA := v.RandomFactor*(random-0.5);
 
-  //AA := -0.3;
+  a := cos(constPI/5.5195)/2.0;
+  //AA := 4.0;
 
   v.C  := AA;
   v.AA := AA;
@@ -241,8 +251,8 @@ begin
   x := 20*v.RandomFactor*(random-0.5);
   y := 20*v.RandomFactor*(random-0.5);
 
-  //x := 0.011;
-  //y := 0.011;
+  x := -1.25;
+  y := 1.25;
 
   fx := x;
   fy := y;
@@ -340,6 +350,13 @@ procedure AdvanceXY;
 begin
   Mira_01;
   accumulate;
+
+  //LET X=mod(XNEW,1)
+  //LET Y=mod(YNEW,1)
+
+  //x := xnew;
+  //y := ynew;
+
 end;
 
 procedure accumulate;
@@ -351,7 +368,7 @@ procedure TListUpdate;
 begin
   if (v.bSqrt = True) then
   begin
-    my_Index := 5*sqrt(5*my_Counter);
+    my_Index := 2*sqrt(2*my_Counter);
   end
   else
   begin
@@ -359,6 +376,10 @@ begin
   end;
 
   color := Round(my_Index);
+
+  if (color < 0) then
+    color := 0;
+    
   v.color := color;
 end;
 
@@ -385,6 +406,56 @@ begin
   ny := Round(ty);
 end;
 
+procedure average_pixel;
+var
+  red_save, grn_save, blu_save: Integer;
+begin
+
+	red_save := red;
+	grn_save := grn;
+	blu_save := blu;
+
+  r := GetRValue(Pix) and $FF;
+  g := GetGValue(Pix) and $FF;;
+  b := GetBValue(Pix) and $FF;
+
+  if (r > red) then
+  	red := Round((r+red_save)*0.5);
+
+  if (g > grn) then
+  	grn := Round((g+grn_save)*0.5);
+
+  if (b > blu) then
+  	blu := Round((b+blu_save)*0.5);
+
+  if (red > 255) then
+    red := 255;
+
+  if (grn > 255) then
+    grn := 255;
+
+  if (blu > 255) then
+    blu := 255;
+
+
+  if (red < 0) then
+    red := 0;
+
+  if (grn < 0) then
+    grn := 0;
+
+  if (blu < 0) then
+    blu := 0;
+
+
+  Pixel := RGB(red, grn, blu);
+
+  red := red_save;
+  grn := grn_save;
+  blu := blu_save;
+
+end;
+
 procedure DrawPointArray;
 begin
   PixelMap;
@@ -392,7 +463,15 @@ begin
   if (nx >= 0) and (nx < v.iWidth) and (ny >= 0) and (ny < v.iHeight) then
   begin
     begin
-      LSum := abs(sin(constPI*arctan((1+x-x_save)/(1+y-y_save))));
+
+      LSum := abs(1+x*x+y*y);
+
+      //LSum := abs(arctan((1+x-x_save)/(1+y-y_save)));
+			//LSum := sin(constPI*LSum+sin(constPI*LSum));
+
+      //LSum := abs(sin(constPI*arctan((1+x-x_save)/(1+y-y_save))));
+
+      //LSum := abs(constPI*arctan((1+x-x_save)/(1+y-y_save)));
 
       //LSum := abs(sin(constPI*((1+x-x_save)+(1+y-y_save))));
       //LSum := 1;
@@ -404,121 +483,181 @@ begin
       TListUpdate;
       coloring;
 
-      (*
-      Pix := v.aPG.Bits[nx, ny];
-
-      r := GetRValue(Pix) and $FF;
-      g := GetGValue(Pix) and $FF;;
-      b := GetBValue(Pix) and $FF;
-
-      if (r > red) then
-        red := Round(r);
-
-      if (g > grn) then
-        grn := Round(g);
-
-      if (b > blu) then
-        blu := Round(b);
-      *)
-
       Pixel := RGB(red, grn, blu);
-
       v.aPG.Bits[nx, ny] := Pixel;
 
-  red := Round(red*0.75);
-  grn := Round(grn*0.75);
-  blu := Round(blu*0.75);
+      (*
+      red := Round(red*0.85);
+      grn := Round(grn*0.85);
+      blu := Round(blu*0.85);
 
-  Pixel := RGB(red, grn, blu);
+		  Pixel := RGB(red, grn, blu);
 
-  if (nx+1 >= 0) and (nx+1 < v.iWidth) and (ny+1 >= 0) and (ny+1 < v.iHeight) then
-  begin
-    Pointer(my_Counter) := v.my_TList[(nx+1)*(v.Width-1)+(ny+1)];
-    if (my_counter <= 50) then
-      v.aPG.Bits[nx+1, ny+1] := Pixel;
-  end;
+  		if (nx+1 >= 0) and (nx+1 < v.iWidth) and (ny+1 >= 0) and (ny+1 < v.iHeight) then
+  		begin
+    		Pointer(my_Counter) := v.my_TList[(nx+1)*(v.Width-1)+(ny+1)];
+    		//if (my_counter <= 50) then
 
-  if (nx-1 >= 0) and (nx-1 < v.iWidth) and (ny-1 >= 0) and (ny-1 < v.iHeight) then
-  begin
-    Pointer(my_Counter) := v.my_TList[(nx-1)*(v.Width-1)+(ny+1)];
-    if (my_counter <= 50) then
-      v.aPG.Bits[nx-1, ny-1] := Pixel;
-  end;
+				Pix := v.aPG.Bits[nx+1, ny+1];
+				average_pixel;
+        v.aPG.Bits[nx+1, ny+1] := Pixel;
 
-  if (nx+1 >= 0) and (nx+1 < v.iWidth) and (ny-1 >= 0) and (ny-1 < v.iHeight) then
-  begin
-    Pointer(my_Counter) := v.my_TList[(nx+1)*(v.Width-1)+(ny-1)];
-    if (my_counter <= 50) then
-      v.aPG.Bits[nx+1, ny-1] := Pixel;
-  end;
+    		my_Counter := my_Counter + Round(10+v.dFactor1 * LSum);
+    		v.my_TList[(nx+1)*(v.Width-1)+(ny+1)] := Pointer(my_Counter);
+  		end;
 
-  if (nx-1 >= 0) and (nx-1 < v.iWidth) and (ny+1 >= 0) and (ny+1 < v.iHeight) then
-  begin
-    Pointer(my_Counter) := v.my_TList[(nx-1)*(v.Width-1)+(ny+1)];
-    if (my_counter <= 50) then
-      v.aPG.Bits[nx-1, ny+1] := Pixel;
-  end;
+  		if (nx-1 >= 0) and (nx-1 < v.iWidth) and (ny-1 >= 0) and (ny-1 < v.iHeight) then
+  		begin
+    		Pointer(my_Counter) := v.my_TList[(nx-1)*(v.Width-1)+(ny+1)];
+    		//if (my_counter <= 50) then
 
-  /////////////
+        Pix := v.aPG.Bits[nx-1, ny-1];
+				average_pixel;
+        v.aPG.Bits[nx-1, ny-1] := Pixel;
 
-  if (nx+0 >= 0) and (nx+0 < v.iWidth) and (ny+1 >= 0) and (ny+1 < v.iHeight) then
-  begin
-    Pointer(my_Counter) := v.my_TList[(nx+0)*(v.Width-1)+(ny+1)];
-    if (my_counter <= 50) then
-      v.aPG.Bits[nx+0, ny+1] := Pixel;
-  end;
+    		my_Counter := my_Counter + Round(10+v.dFactor1 * LSum);
+    		v.my_TList[(nx-1)*(v.Width-1)+(ny-1)] := Pointer(my_Counter);
+  		end;
 
-  if (nx-0 >= 0) and (nx-0 < v.iWidth) and (ny-1 >= 0) and (ny-1 < v.iHeight) then
-  begin
-    Pointer(my_Counter) := v.my_TList[(nx-0)*(v.Width-1)+(ny-1)];
-    if (my_counter <= 50) then
-      v.aPG.Bits[nx-0, ny-1] := Pixel;
-  end;
+  		if (nx+1 >= 0) and (nx+1 < v.iWidth) and (ny-1 >= 0) and (ny-1 < v.iHeight) then
+  		begin
+    		Pointer(my_Counter) := v.my_TList[(nx+1)*(v.Width-1)+(ny-1)];
+    		//if (my_counter <= 50) then
 
-  if (nx+1 >= 0) and (nx+1 < v.iWidth) and (ny-0 >= 0) and (ny-0 < v.iHeight) then
-  begin
-    Pointer(my_Counter) := v.my_TList[(nx+1)*(v.Width-1)+(ny+0)];
-    if (my_counter <= 50) then
-      v.aPG.Bits[nx+1, ny-0] := Pixel;
-  end;
+        Pix := v.aPG.Bits[nx+1, ny-1];
+				average_pixel;
+        v.aPG.Bits[nx+1, ny-1] := Pixel;
 
-  if (nx-1 >= 0) and (nx-1 < v.iWidth) and (ny+0 >= 0) and (ny+0 < v.iHeight) then
-  begin
-    Pointer(my_Counter) := v.my_TList[(nx-1)*(v.Width-1)+(ny+0)];
-    if (my_counter <= 50) then
-      v.aPG.Bits[nx-1, ny+0] := Pixel;
-  end;
+    		my_Counter := my_Counter + Round(10+v.dFactor1 * LSum);
+    		v.my_TList[(nx+1)*(v.Width-1)+(ny-1)] := Pointer(my_Counter);
+  		end;
 
-  /////////////
+  		if (nx-1 >= 0) and (nx-1 < v.iWidth) and (ny+1 >= 0) and (ny+1 < v.iHeight) then
+  		begin
+    		Pointer(my_Counter) := v.my_TList[(nx-1)*(v.Width-1)+(ny+1)];
+    		//if (my_counter <= 50) then
 
-  if (nx+0 >= 0) and (nx+0 < v.iWidth) and (ny+2 >= 0) and (ny+2 < v.iHeight) then
-  begin
-    Pointer(my_Counter) := v.my_TList[(nx+0)*(v.Width-1)+(ny+2)];
-    if (my_counter <= 50) then
-      v.aPG.Bits[nx+0, ny+2] := Pixel;
-  end;
+        Pix := v.aPG.Bits[nx-1, ny+1];
+				average_pixel;
+        v.aPG.Bits[nx-1, ny+1] := Pixel;
 
-  if (nx-0 >= 0) and (nx-0 < v.iWidth) and (ny-2 >= 0) and (ny-2 < v.iHeight) then
-  begin
-    Pointer(my_Counter) := v.my_TList[(nx-0)*(v.Width-1)+(ny-2)];
-    if (my_counter <= 50) then
-      v.aPG.Bits[nx-0, ny-2] := Pixel;
-  end;
+    		my_Counter := my_Counter + Round(10+v.dFactor1 * LSum);
+    		v.my_TList[(nx-1)*(v.Width-1)+(ny+1)] := Pointer(my_Counter);
+  		end;
 
-  if (nx+2 >= 0) and (nx+2 < v.iWidth) and (ny-0 >= 0) and (ny-0 < v.iHeight) then
-  begin
-    Pointer(my_Counter) := v.my_TList[(nx+2)*(v.Width-1)+(ny+0)];
-    if (my_counter <= 50) then
-      v.aPG.Bits[nx+2, ny-0] := Pixel;
-  end;
+  		/////////////
 
-  if (nx-2 >= 0) and (nx-2 < v.iWidth) and (ny+0 >= 0) and (ny+0 < v.iHeight) then
-  begin
-    Pointer(my_Counter) := v.my_TList[(nx-2)*(v.Width-1)+(ny+0)];
-    if (my_counter <= 50) then
-      v.aPG.Bits[nx-2, ny+0] := Pixel;
-  end;
+  		if (nx+0 >= 0) and (nx+0 < v.iWidth) and (ny+1 >= 0) and (ny+1 < v.iHeight) then
+  		begin
+    		Pointer(my_Counter) := v.my_TList[(nx+0)*(v.Width-1)+(ny+1)];
+    		//if (my_counter <= 50) then
 
+        Pix := v.aPG.Bits[nx, ny+1];
+				average_pixel;
+        v.aPG.Bits[nx, ny+1] := Pixel;
+
+    		my_Counter := my_Counter + Round(10+v.dFactor1 * LSum);
+    		v.my_TList[(nx)*(v.Width-1)+(ny+1)] := Pointer(my_Counter);
+  		end;
+
+  		if (nx >= 0) and (nx < v.iWidth) and (ny-1 >= 0) and (ny-1 < v.iHeight) then
+  		begin
+    		Pointer(my_Counter) := v.my_TList[(nx)*(v.Width-1)+(ny-1)];
+    		//if (my_counter <= 50) then
+
+        Pix := v.aPG.Bits[nx, ny-1];
+				average_pixel;
+        v.aPG.Bits[nx, ny-1] := Pixel;
+
+    		my_Counter := my_Counter + Round(10+v.dFactor1 * LSum);
+    		v.my_TList[(nx)*(v.Width-1)+(ny-1)] := Pointer(my_Counter);
+  		end;
+
+  		if (nx+1 >= 0) and (nx+1 < v.iWidth) and (ny >= 0) and (ny < v.iHeight) then
+  		begin
+    		Pointer(my_Counter) := v.my_TList[(nx+1)*(v.Width-1)+(ny)];
+    		//if (my_counter <= 50) then
+
+        Pix := v.aPG.Bits[nx+1, ny];
+				average_pixel;
+        v.aPG.Bits[nx+1, ny] := Pixel;
+
+    		my_Counter := my_Counter + Round(10+v.dFactor1 * LSum);
+    		v.my_TList[(nx+1)*(v.Width-1)+(ny)] := Pointer(my_Counter);
+  		end;
+
+  		if (nx-1 >= 0) and (nx-1 < v.iWidth) and (ny >= 0) and (ny < v.iHeight) then
+  		begin
+    		Pointer(my_Counter) := v.my_TList[(nx-1)*(v.Width-1)+(ny)];
+    		//if (my_counter <= 50) then
+
+        Pix := v.aPG.Bits[nx-1, ny];
+				average_pixel;
+        v.aPG.Bits[nx-1, ny] := Pixel;
+
+    		my_Counter := my_Counter + Round(10+v.dFactor1 * LSum);
+    		v.my_TList[(nx-1)*(v.Width-1)+(ny)] := Pointer(my_Counter);
+  		end;
+
+  		/////////////
+
+  		red := Round(red*0.85);
+  		grn := Round(grn*0.85);
+  		blu := Round(blu*0.85);
+
+  		if (nx >= 0) and (nx < v.iWidth) and (ny+2 >= 0) and (ny+2 < v.iHeight) then
+  		begin
+    		Pointer(my_Counter) := v.my_TList[(nx)*(v.Width-1)+(ny+2)];
+    		//if (my_counter <= 50) then
+
+        Pix := v.aPG.Bits[nx, ny+2];
+				average_pixel;
+        v.aPG.Bits[nx, ny+2] := Pixel;
+
+    		my_Counter := my_Counter + Round(10+v.dFactor1 * LSum);
+    		v.my_TList[(nx+1)*(v.Width-1)+(ny+2)] := Pointer(my_Counter);
+  		end;
+
+  		if (nx >= 0) and (nx < v.iWidth) and (ny-2 >= 0) and (ny-2 < v.iHeight) then
+  		begin
+    		Pointer(my_Counter) := v.my_TList[(nx)*(v.Width-1)+(ny-2)];
+    		//if (my_counter <= 50) then
+
+        Pix := v.aPG.Bits[nx, ny-2];
+				average_pixel;
+        v.aPG.Bits[nx, ny-2] := Pixel;
+
+    		my_Counter := my_Counter + Round(10+v.dFactor1 * LSum);
+    		v.my_TList[(nx)*(v.Width-1)+(ny-2)] := Pointer(my_Counter);
+  		end;
+
+  		if (nx+2 >= 0) and (nx+2 < v.iWidth) and (ny >= 0) and (ny < v.iHeight) then
+      begin
+    		Pointer(my_Counter) := v.my_TList[(nx+2)*(v.Width-1)+(ny)];
+    		//if (my_counter <= 50) then
+
+        Pix := v.aPG.Bits[nx+2, ny];
+				average_pixel;
+        v.aPG.Bits[nx+2, ny] := Pixel;
+
+    		my_Counter := my_Counter + Round(10+v.dFactor1 * LSum);
+    		v.my_TList[(nx+2)*(v.Width-1)+(ny)] := Pointer(my_Counter);
+  		end;
+
+  		if (nx-2 >= 0) and (nx-2 < v.iWidth) and (ny >= 0) and (ny < v.iHeight) then
+  		begin
+    		Pointer(my_Counter) := v.my_TList[(nx-2)*(v.Width-1)+(ny)];
+    		//if (my_counter <= 50) then
+
+        Pix := v.aPG.Bits[nx-2, ny];
+				average_pixel;
+        v.aPG.Bits[nx-2, ny] := Pixel;
+
+    		my_Counter := my_Counter + Round(10+v.dFactor1 * LSum);
+    		v.my_TList[(nx-2)*(v.Width-1)+(ny)] := Pointer(my_Counter);
+  		end;
+
+      *)
 
     end;
   end;
@@ -665,7 +804,11 @@ begin
   if (v.nPoints mod 1000 = 0) then
   begin
     if (v.bModulas = true) then
-      v.AA := V.AA - 0.01*sin(V.AA);
+    begin
+      v.AA := V.AA - 0.0002*sin(V.AA);
+	    //MainForm.UpdateParameters;
+    end;
+
     kicker := kicker + 1;
     //initialize_data;
   end;
@@ -709,11 +852,21 @@ begin
 
   case v.formula of
     1: begin
-         //x := x - 1/sqrt(x*x+y*y)*(x * sign)/20000;
-         //z := x;
-         //x := BB*y + W;
-         //W := AA*x - 2*x*x*(1 - AA) / (1 + x*x);
-         //y := W - z;
+				(*
+         x := x - (x*x)/10+(AA - x*x)*(x * sign)/2000;
+         z := x;
+         x := BB*y + W;
+         W := AA*x - 2*x*x*(1 - AA) / (1 + x*x);
+         y := W - z;
+        *)
+
+        (*
+         x := x - sign/1000;
+         z := x;
+         x := BB*y + W;
+         W := AA*x - 2*x*x*(1 - AA) / (1 + x*x);
+         y := W - z;
+         *)
 
          z := x;
          x := BB*y + W;
@@ -1169,6 +1322,382 @@ begin
         x  := xn;
         end;
 
+    60: begin
+
+         	z := x;
+			   	x := BB*y+W;
+
+         	//x := x + x/20000*sin(x);
+         	//W := AA*x + 0.2*(sin(4*constPI*x + (4*constPI*x) - (1 - AA)*(x*x)))/(1 + x*x)*sign;
+
+         	//x := x + x/20000*sin(x);
+         	//W := AA*x + 0.2*(sin(4*constPI*x + (4*constPI*x) - (1 - AA)*(x*x)))/(1 + x*x)*sign;
+
+         	//x := x + x/20000*sin(x);
+         	//W := AA*x + 0.5*(sin(2*constPI*x + (2*constPI*x) - (1 - AA)*(x*x)))/(1 + x*x)*sign;
+
+         	//x := x + x/700*sin(x);
+         	//W := AA*x + 0.6*(sin(2*constPI*x + (2*constPI*x) - (1 - AA)*(x*x)))/(1 + x*x)*sign;
+
+  			 	//x := x + x/400*sin(x);
+  			 	//W := AA*x + 0.2*(sin(constPI*x + (constPI*x) - (1 - AA)*(x*x)))/(1 + x*x)*sign;
+
+  			 	//W := AA*x - 0.3*sin(x + sin(x)) + 2*(1 - AA)*(1 - x*x)/((1 + x*x))*sign;
+
+  			 	//W := (1-AA*x) + (sin(2*x + sin(2*x + sin(2*x)) - (1 - AA)*(x*x)))/(1 + x*x)*sign;
+
+			  	W := (1-AA*x) + (sin(constPI*x + sin(constPI*x) - (1 - AA)*(x*x)))/(1 + x*x)*sign;
+
+			  	//W := AA*x + (sin(x + sin(x - (1 - AA)*(x*x))))/(1 + x*x)*sign;
+
+			  	//W := sign*(AA*x + (1 - AA)*(2*x*x))/(1+x*x) + sin(AA+x);
+
+			  	//W := -0.05*v.af[1]*x + (constPI-v.af[2]*x)*(v.af[3]*x*x)/(1+x*x);
+
+			  	//W := -0.05*AA*x + (constPI-AA*x)*(AA*x*x)/(1+x*x);
+
+			  	//W := sign*(v.af[7] + v.af[2]*x*sin(v.af[1]+x) +
+			    //                     v.af[2]*x*sin(v.af[1]+x) +
+			      //                   v.af[2]*x*sin(v.af[1]+x));
+
+			  	//W := sign*AA + AA*x*sin(constPI+x); // this is cool
+			  	//W := sign*AA + sin(x) * sin(constPI+x); // this is cool
+			  	//W := sign*AA + sin(1/x); // this is cool
+
+			  	//AA := constPI*AA;
+			  	//W := const2PI*sign*AA + constPI + sin(constPI+sin(constPI+x)); // this is cool
+			  	//W := const2PI*sign*AA + constPI + cos(x) + sin(constPI+sin(constPI+x)); // this is cool
+
+			  	//W := AA * sign * (const2PI - x)  + sin(constPI - x); // this is cool
+
+    			y := W - z;
+
+		    	if (abs(x) <= 1e-4) or (abs(y) <= 1e-4) then
+    		 	begin
+       			x := (random-0.5);
+      			y := (random-0.5);
+       			x := sin(2*constPI*x);
+      			y := sin(2*constPI*y);
+    			end;
+
+          if (abs(x) > 1e4) or (abs(y) > 1e4) then
+          begin
+          	x := (random-0.5);
+          	y := (random-0.5);
+            x := sin(x);
+            y := sin(y);
+          end;
+
+	    	end;
+
+    61: begin
+
+         	z := x;
+			   	x := BB*y+W;
+
+				  //W := AA*x + ((1 - AA)*(2*x*x))/(1+x*x);
+				  //W := (AA*x) + sign*((1 - AA)*(2*x*x))/(1+x*x);
+
+				  W := (AA*x) + sign*(1-AA)*v.af[1]*(sin(x+sin(x)));
+
+          //W := sign*(AA*x*sin(v.af[1]+x) + v.af[2]*x*sin(v.af[3]+x) + v.af[4]*x*sin(v.af[5]+x));
+
+			    //W := sign*(v.af[7] + v.af[2]*x*sin(v.af[1]+x) +
+      			//                   v.af[2]*x*sin(v.af[1]+x) +
+            	//		             v.af[2]*x*sin(v.af[1]+x));
+
+				  //W := sign*AA*x*sin(v.af[3]+x) + AA*x*sin(v.af[5]+x);
+
+          //W :=  sign*((1 - AA)*(2*x*x))/(1+x*x);
+
+    			//W :=        (sign*(v.af[1]*x*sin(v.af[4]+x) +
+            //           v.af[2]*x*sin(v.af[5]+x) +
+              //         v.af[4]*x*sin(v.af[7]+x)));
+
+    			y := W - z;
+
+		    	if abs(x) <= 1e-4 then
+    		 	begin
+       			x := 5*(random-0.5);
+       			//x := sin(2*constPI*x);
+    			end;
+
+    			if abs(y) <= 1e-4 then
+    			begin
+      			y := 5*(random-0.5);
+      			//y := sin(2*constPI*y);
+    			end;
+
+		    	if (abs(x) <= 1e-4) or (abs(y) <= 1e-4) then
+    		 	begin
+       			x := (random-0.5);
+      			y := (random-0.5);
+       			x := sin(2*constPI*x);
+      			y := sin(2*constPI*y);
+    			end;
+
+          if (abs(x) > 1e4) or (abs(y) > 1e4) then
+          begin
+          	x := (random-0.5);
+          	y := (random-0.5);
+            x := sin(x);
+            y := sin(y);
+          end;
+
+			end;
+
+    62: begin
+
+         	z := x;
+			   	x := BB*y+W;
+
+    			//W :=  (sign*(v.af[1]*x*sin(v.af[4]+x) +
+            //           v.af[2]*x*sin(v.af[5]+x) +
+              //         v.af[4]*x*sin(v.af[7]+x)));
+
+			    //W := sign*(v.af[7] + v.af[2]*x*sin(v.af[1]+x) +
+      			//                   v.af[2]*x*sin(v.af[1]+x) +
+            	//		             v.af[2]*x*sin(v.af[1]+x));
+
+				  //W := AA*x + ((1 - AA)*(2*x*x))/(1+x*x);
+
+				  W := sign*AA*sin(v.af[3]*x) + AA*sin(v.af[5]*x); // 62
+
+				  //W := sign*AA*sin(v.af[1]*x+sin(v.af[2]*x)) + AA*sin(v.af[3]*x+sin(v.af[4]*x)); // 63
+
+				  //W := sign*AA*sin(v.af[1]*x)+AA*sin(v.af[2]*x);
+
+				  //W := sign*AA*sin(v.af[1]*x)+AA*sin(v.af[2]*x+sin(v.af[3]*x)); // 64
+
+				  //W := (AA*x) + sign*((1 - AA)*(2*x*x))/(1+x*x);
+
+				  //W := (AA*x) + sin((1-AA)+(sin(x+sin(1+x))));
+
+         	//x := x + x/20000*sin(x);
+         	//W := AA*x + 0.2*(sin(4*constPI*x + (4*constPI*x) - (1 - AA)*(x*x)))/(1 + x*x)*sign;
+
+          //W := sign*(AA*x*sin(v.af[1]+x) + v.af[2]*x*sin(v.af[3]+x) + v.af[4]*x*sin(v.af[5]+x));
+
+			    //W := sign*(v.af[7] + v.af[2]*x*sin(v.af[1]+x) +
+      			//                   v.af[2]*x*sin(v.af[1]+x) +
+            	//		             v.af[2]*x*sin(v.af[1]+x));
+
+				  //W := sign*AA*x*sin(v.af[3]+x) + AA*x*sin(v.af[5]+x);
+
+          //W :=  sign*((1 - AA)*(2*x*x))/(1+x*x);
+
+    			//W :=        (sign*(v.af[1]*x*sin(v.af[4]+x) +
+            //           v.af[2]*x*sin(v.af[5]+x) +
+              //         v.af[4]*x*sin(v.af[7]+x)));
+
+    			y := W - z;
+
+		    	if (abs(x) <= 1e-4) or (abs(y) <= 1e-4) then
+    		 	begin
+       			x := (random-0.5);
+      			y := (random-0.5);
+       			x := sin(2*constPI*x);
+      			y := sin(2*constPI*y);
+    			end;
+
+          if (abs(x) > 1e4) or (abs(y) > 1e4) then
+          begin
+          	x := (random-0.5);
+          	y := (random-0.5);
+            x := sin(x);
+            y := sin(y);
+          end;
+			end;
+
+    63: begin
+
+         	z := x;
+			   	x := BB*y+W;
+
+    			//W :=  (sign*(v.af[1]*x*sin(v.af[4]+x) +
+            //           v.af[2]*x*sin(v.af[5]+x) +
+              //         v.af[4]*x*sin(v.af[7]+x)));
+
+			    //W := sign*(v.af[7] + v.af[2]*x*sin(v.af[1]+x) +
+      			//                   v.af[2]*x*sin(v.af[1]+x) +
+            	//		             v.af[2]*x*sin(v.af[1]+x));
+
+				  //W := AA*x + ((1 - AA)*(2*x*x))/(1+x*x);
+
+				  //W := sign*AA*sin(v.af[3]*x) + AA*sin(v.af[5]*x); // OK
+
+				  W := sign*AA*sin(v.af[1]*x+sin(v.af[2]*x)) + AA*sin(v.af[3]*x+sin(v.af[4]*x)); // OK
+
+				  //W := sign*AA*sin(v.af[1]*x)+AA*sin(v.af[2]*x);
+
+				  //W := sign*AA*sin(v.af[1]*x)+AA*sin(v.af[2]*x+sin(v.af[3]*x));
+
+				  //W := (AA*x) + sign*((1 - AA)*(2*x*x))/(1+x*x);
+
+				  //W := (AA*x) + sin((1-AA)+(sin(x+sin(1+x))));
+
+         	//x := x + x/20000*sin(x);
+         	//W := AA*x + 0.2*(sin(4*constPI*x + (4*constPI*x) - (1 - AA)*(x*x)))/(1 + x*x)*sign;
+
+          //W := sign*(AA*x*sin(v.af[1]+x) + v.af[2]*x*sin(v.af[3]+x) + v.af[4]*x*sin(v.af[5]+x));
+
+			    //W := sign*(v.af[7] + v.af[2]*x*sin(v.af[1]+x) +
+      			//                   v.af[2]*x*sin(v.af[1]+x) +
+            	//		             v.af[2]*x*sin(v.af[1]+x));
+
+				  //W := sign*AA*x*sin(v.af[3]+x) + AA*x*sin(v.af[5]+x);
+
+          //W :=  sign*((1 - AA)*(2*x*x))/(1+x*x);
+
+    			//W :=        (sign*(v.af[1]*x*sin(v.af[4]+x) +
+            //           v.af[2]*x*sin(v.af[5]+x) +
+              //         v.af[4]*x*sin(v.af[7]+x)));
+
+    			y := W - z;
+
+		    	if (abs(x) <= 1e-4) or (abs(y) <= 1e-4) then
+    		 	begin
+       			x := (random-0.5);
+      			y := (random-0.5);
+       			x := sin(2*constPI*x);
+      			y := sin(2*constPI*y);
+    			end;
+
+          if (abs(x) > 1e4) or (abs(y) > 1e4) then
+          begin
+          	x := (random-0.5);
+          	y := (random-0.5);
+            x := sin(x);
+            y := sin(y);
+          end;
+			end;
+
+    64: begin
+
+         	z := x;
+			   	x := BB*y+W;
+
+    			//W :=  (sign*(v.af[1]*x*sin(v.af[4]+x) +
+            //           v.af[2]*x*sin(v.af[5]+x) +
+              //         v.af[4]*x*sin(v.af[7]+x)));
+
+			    //W := sign*(v.af[7] + v.af[2]*x*sin(v.af[1]+x) +
+      			//                   v.af[2]*x*sin(v.af[1]+x) +
+            	//		             v.af[2]*x*sin(v.af[1]+x));
+
+				  //W := AA*x + ((1 - AA)*(2*x*x))/(1+x*x);
+
+				  //W := sign*AA*sin(v.af[3]*x) + AA*sin(v.af[5]*x); // OK
+				  //W := sign*AA*sin(v.af[1]*x+sin(v.af[2]*x)) + AA*sin(v.af[3]*x+sin(v.af[4]*x)); // OK
+
+				  //W := sign*AA*sin(v.af[1]*x)+AA*sin(v.af[2]*x);
+
+				  W := sign*AA*sin(v.af[1]*x)+AA*sin(v.af[2]*x+sin(v.af[3]*x)); // 64
+
+				  //W := (AA*x) + sign*((1 - AA)*(2*x*x))/(1+x*x);
+
+				  //W := (AA*x) + sin((1-AA)+(sin(x+sin(1+x))));
+
+         	//x := x + x/20000*sin(x);
+         	//W := AA*x + 0.2*(sin(4*constPI*x + (4*constPI*x) - (1 - AA)*(x*x)))/(1 + x*x)*sign;
+
+          //W := sign*(AA*x*sin(v.af[1]+x) + v.af[2]*x*sin(v.af[3]+x) + v.af[4]*x*sin(v.af[5]+x));
+
+			    //W := sign*(v.af[7] + v.af[2]*x*sin(v.af[1]+x) +
+      			//                   v.af[2]*x*sin(v.af[1]+x) +
+            	//		             v.af[2]*x*sin(v.af[1]+x));
+
+				  //W := sign*AA*x*sin(v.af[3]+x) + AA*x*sin(v.af[5]+x);
+
+          //W :=  sign*((1 - AA)*(2*x*x))/(1+x*x);
+
+    			//W :=        (sign*(v.af[1]*x*sin(v.af[4]+x) +
+            //           v.af[2]*x*sin(v.af[5]+x) +
+              //         v.af[4]*x*sin(v.af[7]+x)));
+
+    			y := W - z;
+
+		    	if (abs(x) <= 1e-4) or (abs(y) <= 1e-4) then
+    		 	begin
+       			x := (random-0.5);
+      			y := (random-0.5);
+       			x := sin(2*constPI*x);
+      			y := sin(2*constPI*y);
+    			end;
+
+          if (abs(x) > 1e4) or (abs(y) > 1e4) then
+          begin
+          	x := (random-0.5);
+          	y := (random-0.5);
+            x := sin(x);
+            y := sin(y);
+          end;
+			end;
+
+    65: begin
+
+         	z := x;
+			   	x := BB*y+W;
+
+    			//W :=  (sign*(v.af[1]*x*sin(v.af[4]+x) +
+            //           v.af[2]*x*sin(v.af[5]+x) +
+              //         v.af[4]*x*sin(v.af[7]+x)));
+
+			    //W := sign*(v.af[7] + v.af[2]*x*sin(v.af[1]+x) +
+      			//                   v.af[2]*x*sin(v.af[1]+x) +
+            	//		             v.af[2]*x*sin(v.af[1]+x));
+
+				  //W := AA*x + ((1 - AA)*(2*x*x))/(1+x*x);
+
+				  //W := sign*AA*sin(v.af[3]*x) + AA*sin(v.af[5]*x); // OK
+				  //W := sign*AA*sin(v.af[1]*x+sin(v.af[2]*x)) + AA*sin(v.af[3]*x+sin(v.af[4]*x)); // OK
+
+				  //W := sign*AA*sin(v.af[1]*x)+AA*sin(v.af[2]*x);
+
+				  //W := sign*AA*sin(v.af[1]*x)+AA*sin(v.af[2]*x+sin(v.af[3]*x)); 64
+
+				  W := sign*AA*sin(v.af[1]*x)+sign*AA*sin(v.af[2]*x+sign*sin(v.af[3]*x));
+
+				  //W := (AA*x) + sign*((1 - AA)*(2*x*x))/(1+x*x);
+
+				  //W := (AA*x) + sin((1-AA)+(sin(x+sin(1+x))));
+
+         	//x := x + x/20000*sin(x);
+         	//W := AA*x + 0.2*(sin(4*constPI*x + (4*constPI*x) - (1 - AA)*(x*x)))/(1 + x*x)*sign;
+
+          //W := sign*(AA*x*sin(v.af[1]+x) + v.af[2]*x*sin(v.af[3]+x) + v.af[4]*x*sin(v.af[5]+x));
+
+			    //W := sign*(v.af[7] + v.af[2]*x*sin(v.af[1]+x) +
+      			//                   v.af[2]*x*sin(v.af[1]+x) +
+            	//		             v.af[2]*x*sin(v.af[1]+x));
+
+				  //W := sign*AA*x*sin(v.af[3]+x) + AA*x*sin(v.af[5]+x);
+
+          //W :=  sign*((1 - AA)*(2*x*x))/(1+x*x);
+
+    			//W :=        (sign*(v.af[1]*x*sin(v.af[4]+x) +
+            //           v.af[2]*x*sin(v.af[5]+x) +
+              //         v.af[4]*x*sin(v.af[7]+x)));
+
+    			y := W - z;
+
+		    	if (abs(x) <= 1e-4) or (abs(y) <= 1e-4) then
+    		 	begin
+       			x := (random-0.5);
+      			y := (random-0.5);
+       			x := sin(2*constPI*x);
+      			y := sin(2*constPI*y);
+    			end;
+
+          if (abs(x) > 1e4) or (abs(y) > 1e4) then
+          begin
+          	x := (random-0.5);
+          	y := (random-0.5);
+            x := sin(x);
+            y := sin(y);
+          end;
+			end;
+
 	end;
 
   // gm-03
@@ -1195,6 +1724,24 @@ begin
   //W := const2PI*sign*AA + constPI + sin(constPI+sin(constPI+x)); // this is cool
   //W := const2PI*sign*AA + constPI + cos(x) + sin(constPI+sin(constPI+x)); // this is cool
   //W := AA * sign + AA + sin(x + sin(x));
+
+
+  if (abs(x) <= 1e-4) or (abs(y) <= 1e-4) then
+  begin
+  	x := (random-0.5);
+    y := (random-0.5);
+    x := sin(2*constPI*x);
+    y := sin(2*constPI*y);
+  end;
+
+  if (abs(x) > 1e4) or (abs(y) > 1e4) then
+  begin
+  	x := (random-0.5);
+    y := (random-0.5);
+    x := sin(x);
+    y := sin(y);
+  end;
+
 
   v.zx := x;
   v.zy := y;

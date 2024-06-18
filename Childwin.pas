@@ -151,6 +151,13 @@ type
     Draw55: TMenuItem;
     N2: TMenuItem;
     N3: TMenuItem;
+    Sinus1: TMenuItem;
+    Draw60: TMenuItem;
+    Draw61: TMenuItem;
+    Draw62: TMenuItem;
+    Draw63: TMenuItem;
+    Draw64: TMenuItem;
+    Draw65: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
     procedure UpdateMenuItems(Sender: TObject);
@@ -259,6 +266,12 @@ type
     procedure Draw53Click(Sender: TObject);
     procedure Draw54Click(Sender: TObject);
     procedure Draw55Click(Sender: TObject);
+    procedure Draw60Click(Sender: TObject);
+    procedure Draw61Click(Sender: TObject);
+    procedure Draw62Click(Sender: TObject);
+    procedure Draw63Click(Sender: TObject);
+    procedure Draw64Click(Sender: TObject);
+    procedure Draw65Click(Sender: TObject);
 
   private
     { Private declarations }
@@ -312,7 +325,7 @@ const
   constTest         = 10000;
   constLMin         = -10.000;
 
-  constVersionNumber: String = 'Atriatix v0.002';
+  constVersionNumber: String = 'Atriatix v0.005';
 
   constBifurcation = 1;
   constRandom = 2;
@@ -403,7 +416,7 @@ begin
     v.dGrnStep := 0.0;
     v.dBluStep := 0.0;
 
-    v.formula := 1;
+    v.formula := 62;
     v.dFactor1 := 10;
     v.dFactor2 := 0.1;
     v.RandomFactor := 2.0;
@@ -567,6 +580,13 @@ begin
   Draw54.Checked := False;
   Draw55.Checked := False;
 
+  Draw60.Checked := False;
+  Draw61.Checked := False;
+  Draw62.Checked := False;
+  Draw63.Checked := False;
+  Draw64.Checked := False;
+  Draw65.Checked := False;
+
   case v.formula of
   1: Draw01.Checked := True;
   2: Draw02.Checked := True;
@@ -623,6 +643,14 @@ begin
   53: Draw53.Checked := True;
   54: Draw54.Checked := True;
   55: Draw55.Checked := True;
+
+  60: Draw60.Checked := True;
+  61: Draw61.Checked := True;
+  62: Draw62.Checked := True;
+  63: Draw63.Checked := True;
+  64: Draw64.Checked := True;
+  65: Draw65.Checked := True;
+
   end;
 
 end;
@@ -632,6 +660,7 @@ begin
   v.aPG.Changed(Self);
   Caption := 'Busy... ' + Format ('%d   %d   %f   %f   %f', [v.T1, v.color, v.AA, v.zx,v.zy]);
   v.T1 := v.T1+1;
+  //MainForm.UpdateParameters;
   Application.HandleMessage;
   Invalidate;
 end;
@@ -1956,6 +1985,57 @@ begin
   UpdateGrafX;
 end;
 
+//-----------
+
+procedure TMDIChild.Draw60Click(Sender: TObject);
+begin
+  v.BB := 1.00;
+  v.bInitialize := True;
+  v.formula := 60;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw61Click(Sender: TObject);
+begin
+  v.BB := 1.00;
+  v.bInitialize := True;
+  v.formula := 61;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw62Click(Sender: TObject);
+begin
+  v.BB := 1.00;
+  v.bInitialize := True;
+  v.formula := 62;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw63Click(Sender: TObject);
+begin
+  v.BB := 1.00;
+  v.bInitialize := True;
+  v.formula := 63;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw64Click(Sender: TObject);
+begin
+  v.BB := 1.00;
+  v.bInitialize := True;
+  v.formula := 64;
+  UpdateGrafX;
+end;
+
+procedure TMDIChild.Draw65Click(Sender: TObject);
+begin
+  v.BB := 1.00;
+  v.bInitialize := True;
+  v.formula := 65;
+  UpdateGrafX;
+end;
+
+
 // ------
 
 procedure TMDIChild.ModulasClick(Sender: TObject);
@@ -2045,8 +2125,5 @@ begin
   v.aPG := ResultPG;
 end;
 
-
 end.
-
-
 
